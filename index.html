@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>ESLab1 Chat Room</title>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
     <style>
       html { 
         height: 100%; 
@@ -9,10 +10,12 @@
       }
       *, *:before, *:after { box-sizing: inherit; }
       body { 
-        font: 13px -apple-system, BlinkMacSystemFont, sans-serif; 
+        height: 100%; 
+        font: 13px 'Ubuntu', sans-serif;
         margin: 0; min-height: 100%; 
         display: flex; 
-        flex-flow: row wrap
+        flex-flow: row wrap;
+        overflow: hidden;
       }
       form { 
         bottom: 0; 
@@ -50,15 +53,24 @@
         flex-direction: column;
         width: calc(100% - 200px);
       }
+      #members {
+        text-align: center;
+      }
       .time {
         font-size: 6px;
       }
-      section {
-        flex: 4;
+      header {
         background: deepskyblue;
+        text-align: center;
+        height: 10%;
+      }
+      section {
+        background: deepskyblue;
+        height: 70%;
+        overflow-y: auto;
       }
       footer {
-        flex: 1;
+        height: 20%;
         background: lightgreen;
       }
       aside {
@@ -71,7 +83,7 @@
         width: 70%;
       }
       aside button {
-        width: 19%;
+        width: 30%;
         background: rgb(130, 224, 255);
         border: none;
         padding: 10px;
@@ -80,27 +92,28 @@
   </head>
   <body>
     <div id="container">
-      <section>
-        <h2><div style="text-align:center;">Messages</div></h2>
+      <header>
+        <h2>Messages</h2>
+      </header>
+      <section id="msg_sec">
         <ul id="messages"></ul>
       </section>
-        <footer>
-          <h2>Input</h2>
-          <form action="">
-              <input id="boxMessage" autocomplete="off" disabled="true"/><button id="buttonMessage" disabled="true">Send</button>
-          </form>
-        </footer>
+      <footer>
+        <form action="">
+            <input id="boxMessage" autocomplete="off" disabled="true" placeholder ="Type a messages..."/><button id="buttonMessage" disabled="true">Send</button>
+        </form>
+      </footer>
     </div>
     <aside>
-      <h2>Members</h2>
-      <input id="boxNick" type="text" placeholder="your nickname?" size="13"/>
-      <button type="submit" id="buttonNick" onClick="setMyName()">Set</button>
+      <h2 id="members">Members</h2>
+        <input id="boxNick" type="text" placeholder="Type your nickname..." size="13"/><button type="submit" id="buttonNick" onClick="setMyName()">Set</button>
       <ul id="ulist"></ul>
     </aside>
 
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+      var objDiv = document.getElementById("msg_sec");
       var usersList = [];
       var myNick = "";
       imTyping = false;
@@ -112,7 +125,7 @@
       });
 
       socket.on('nick', function(nick){
-        myNick=nick;
+        myNick = nick;
       });
 
       $('form').submit(function(){
@@ -128,11 +141,11 @@
         if (msg[1] == myNick) {
           $("#messages").append("<li><p align='right'>"+msg[2]+"</p></li>");
           $("#messages").append("<li><p class='time' align='right'>"+msg[0]+"</p></li>");
-        }
-        else {
+        } else {
           $("#messages").append("<li><b><p align='left'>"+msg[1]+":</b> "+msg[2]+"</p></li>");
           $("#messages").append("<li><p class='time' align='left'>"+msg[0]+"</p></li>");
         }
+        objDiv.scrollTop = objDiv.scrollHeight;
       });
 
       socket.on('info', function(inf){
@@ -150,8 +163,10 @@
       function setMyName(){
         myNick = document.getElementById("boxNick").value;
         socket.emit("set nick", myNick);
-        document.getElementById("boxNick").disabled=true;
-        document.getElementById("buttonNick").hidden=true;
+        // delete input and button after nickname is entered
+        document.getElementById("boxNick").outerHTML='';
+        document.getElementById("buttonNick").outerHTML='';
+
         document.getElementById("boxMessage").disabled=false;
         document.getElementById("buttonMessage").disabled=false;
       }
@@ -177,18 +192,15 @@
         day = date.getDay();
         days = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
         h = date.getHours();
-        if(h<10)
-        {
+        if(h<10) {
           h = "0"+h;
         }
         m = date.getMinutes();
-        if(m<10)
-        {
+        if(m<10) {
           m = "0"+m;
         }
         s = date.getSeconds();
-        if(s<10)
-        {
+        if(s<10) {
           s = "0"+s;
         }
         result = ''+days[day]+' '+months[month]+' '+d+' '+year+' '+h+':'+m+':'+s;
@@ -199,8 +211,7 @@
         if ( $('#boxMessage').val().length != "" && imTyping == false ){
             socket.emit("typing");
             imTyping = true;
-        }
-        else if ( $('#boxMessage').val() == "" ) {
+        } else if ( $('#boxMessage').val() == "" ) {
             socket.emit("not typing");
             imTyping = false;
         }
