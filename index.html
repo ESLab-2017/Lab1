@@ -36,16 +36,23 @@
         padding: 0; 
       }
       #messages li { 
-        padding: 5px 10px; 
+        box-sizing: border-box;
+        height: 25px;
+        padding: 5px 10px;
       }
-      #messages li:nth-child(odd) { 
-        background: #eee; 
+      #messages li:nth-child(4n) { 
+        background: #eee;
       }
-
-      #container{
+      #messages li:nth-child(4n+1) { 
+        background: #eee;
+      }
+      #container {
         display: flex;
         flex-direction: column;
         width: calc(100% - 200px);
+      }
+      .time {
+        font-size: 6px;
       }
       section {
         flex: 4;
@@ -120,10 +127,14 @@
       });
 
       socket.on('chat message', function(msg){
-        if (msg[0] == myNick)
-           $("#messages").append("<li><p align='right'>"+msg[0]+ ' '+msg[2]+"</p>");
-        else
-           $("#messages").append("<li><b><p align='left'>"+msg[0]+":</b> "+msg[1]+' '+msg[2]+"</p>");
+        if (msg[1] == myNick) {
+          $("#messages").append("<li><p align='right'>"+msg[2]+"</p></li>");
+          $("#messages").append("<li><p class='time' align='right'>"+msg[0]+"</p></li>");
+        }
+        else {
+          $("#messages").append("<li><b><p align='left'>"+msg[1]+":</b> "+msg[2]+"</p></li>");
+          $("#messages").append("<li><p class='time' align='left'>"+msg[0]+"</p></li>");
+        }
       });
 
       socket.on('info', function(inf){
@@ -170,17 +181,17 @@
         h = date.getHours();
         if(h<10)
         {
-                h = "0"+h;
+          h = "0"+h;
         }
         m = date.getMinutes();
         if(m<10)
         {
-                m = "0"+m;
+          m = "0"+m;
         }
         s = date.getSeconds();
         if(s<10)
         {
-                s = "0"+s;
+          s = "0"+s;
         }
         result = ''+days[day]+' '+months[month]+' '+d+' '+year+' '+h+':'+m+':'+s;
         return result
