@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      html { height: 100%; box-sizing: border-box; }
+      *, *:before, *:after { box-sizing: inherit; }
+      body { font: 13px Helvetica, Arial; margin: 0; min-height: 100%; display: flex; flex-flow: row wrap}
+      form { background: #000; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 80%; margin-right: .5%; }
+      form button { width: 19%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+
+      #container{
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - 200px);
+      }
+      section {
+        flex: 4;
+        background: deepskyblue;
+      }
+      footer {
+        flex: 1;
+        background: lightgreen;
+      }
+      aside {
+        background: hotpink;
+        flex: 1;
+      }
+      aside input {
+        border: 0;
+        padding: 10px;
+        width: 70%;
+      }
+      aside button {
+        width: 19%;
+        background: rgb(130, 224, 255);
+        border: none;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+        <section>
+            <h2>Messages</h2>
+            <ul id="messages"></ul>
+        </section>
+        <footer>
+            <h2>Input</h2>
+            <form action="">
+                <input id="boxMessage" autocomplete="off" disabled="true"/><button id="buttonMessage" disabled="true">Send</button>
+            </form>
+        </footer>
+    </div>
+    <aside>
+      <h2>Members</h2>
+      <input id="boxNick" type="text" placeholder="your nickname?" size="13"/>
+      <button type="submit" id="buttonNick" onClick="setMyName()">Set</button>
+      <ul id="ulist"></ul>
+    </aside>
+
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var usersList = [];
+      var myNick = "";
+      imTyping = false;
+
+      var socket = io();
+
+      socket.on("connect", function(e){
+        socket.emit("start");
+      });
+
+      socket.on('nick', function(nick){
+        myNick=nick;
+      });
+
+      $('form').submit(function(){
+        var temp = [myNick , $("#boxMessage").val()];
+        socket.emit("send chat message", temp);
+        $("#boxMessage").val("");
+        imTyping = false;
+        socket.emit("not typing");
+        return false;
+      });
+
+      socket.on('chat message', function(msg){
+        $("#messages").append("<li><b>"+msg[0]+":</b> "+msg[1]);
+      });
+
+      socket.on('info', function(inf){
+        $('#messages').append('<li><i>' + inf + '</i></li>');
+      });
+
+      socket.on('users list', function(usersList){
+          updateUserList(usersList);
+      });
+
+      socket.on('typing signal', function(usersList){
+          updateUserList(usersList);
+      });
+
+      function setMyName(){
+        myNick = document.getElementById("boxNick").value;
+        socket.emit("set nick", myNick);
+        document.getElementById("boxNick").disabled=true;
+        document.getElementById("buttonNick").hidden=true;
+        document.getElementById("boxMessage").disabled=false;
+        document.getElementById("buttonMessage").disabled=false;
+      }
+
+      function updateUserList(u){
+        var list = document.getElementById("ulist");
+        list.innerHTML = "";
+
+        for (var i = 0; i < u.length; i++ ) {
+            var item = document.createElement("li");
+            item.innerHTML = u[i];
+            list.appendChild(item);
+        }
+      }
+
+      $('#boxMessage').on('input', function() {
+        if ( $('#boxMessage').val().length != "" && imTyping == false ){
+            socket.emit("typing");
+            imTyping = true;
+        }
+        else if ( $('#boxMessage').val() == "" ) {
+            socket.emit("not typing");
+            imTyping = false;
+        }
+      });
+
+    </script>
+
+  </body>
+</html>
