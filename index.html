@@ -121,7 +121,14 @@
       });
 
       socket.on('chat message', function(msg){
-        $("#messages").append("<li><b>"+msg[0]+":</b> "+msg[1]);
+        if (msg[0] == myNick)
+        {
+           $("#messages").append("<li><p align=right>"+msg[1]+"</p>");
+        }
+        else
+        {
+           $("#messages").append("<li><b>"+msg[0]+":</b> "+msg[1]);
+        }        
       });
 
       socket.on('info', function(inf){
