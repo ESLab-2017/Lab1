@@ -59,7 +59,7 @@
       }
       .time {
         font-size: 6px;
-        color: #3C3C3C;
+        color: #8E8E8E;
       }
       header {
         background: #3b5998;
@@ -143,7 +143,7 @@
 
       socket.on('chat message', function(msg){
         if (msg[1] == myNick) {
-          $("#messages").append("<li><p align='right'>"+msg[2]+"</p></li>");
+          $("#messages").append("<li><p align='right'>"+msg[2]+"</p></br></li>");
           $("#messages").append("<li><p class='time' align='right'>"+msg[0]+"</p></li>");
         } else {
           $("#messages").append("<li><b><p align='left'>"+msg[1]+":</b> "+msg[2]+"</p></li>");
