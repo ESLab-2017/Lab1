@@ -75,7 +75,7 @@
   <body>
     <div id="container">
         <section>
-            <h2>Messages</h2>
+            <h2><div style="text-align:center;">Messages</div></h2>
             <ul id="messages"></ul>
         </section>
         <footer>
@@ -122,11 +122,11 @@
       socket.on('chat message', function(msg){
         if (msg[0] == myNick)
         {
-           $("#messages").append("<li><p align=right>"+msg[1]+"</p>");
+           $("#messages").append("<li><p align='right'>"+msg[1]+"</p>");
         }
         else
         {
-           $("#messages").append("<li><b><p align=left>"+msg[0]+":</b> "+msg[1]+"</p>");
+           $("#messages").append("<li><b><p align='left'>"+msg[0]+":</b> "+msg[1]+"</p>");
         }        
       });
 
