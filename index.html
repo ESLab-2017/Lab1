@@ -59,6 +59,7 @@
       }
       .time {
         font-size: 6px;
+        color: #3C3C3C;
       }
       header {
         background: #3b5998;
@@ -179,12 +180,18 @@
         list.innerHTML = "";
 
         for (var i = 0; i < u.length; i++ ) {
-            var item = document.createElement("li");
-            if (u[i] == myNick)
+            if (u[i] == myNick) {
+               var item = document.createElement("li");
                item.innerHTML = "<b>" + u[i] + "</b> <i>(You)</i>";
-            else
+               list.appendChild(item);      
+            }     
+        }
+        for (var i = 0; i < u.length; i++ ) {
+            if (u[i] != myNick) {
+               var item = document.createElement("li");
                item.innerHTML = u[i];
-            list.appendChild(item);
+               list.appendChild(item);
+            }
         }
       }
 
