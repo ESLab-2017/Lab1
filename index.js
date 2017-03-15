@@ -68,8 +68,8 @@ io.on('connection', function(socket){
    });
 });
 
-http.listen(3000, function(){
-  console.log("listening on localhost:3000 and "+ip.address()+":3000");
+http.listen(8080, function(){
+  console.log("listening on localhost:8080 and "+ip.address()+":8080");
 });
 
 //add sudo comment
