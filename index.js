@@ -71,3 +71,5 @@ io.on('connection', function(socket){
 http.listen(3000, function(){
   console.log("listening on localhost:3000 and "+ip.address()+":3000");
 });
+
+//add sudo comment
