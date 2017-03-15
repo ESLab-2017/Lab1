@@ -68,16 +68,8 @@ io.on('connection', function(socket){
    });
 });
 
-if (module === require.main) {
-  // [START server]
-  // Start the server
-  const server = app.listen(process.env.PORT || 8080, () => {
-    const port = server.address().port;
-    console.log(`App listening on port ${port}`);
-  });
-  // [END server]
-}
-
-module.exports = app;
+http.listen(8080, function(){
+  console.log("listening on localhost:8080 and "+ip.address()+":8080");
+});
 
 //add sudo comment
