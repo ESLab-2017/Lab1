@@ -111,7 +111,7 @@
       });
 
       $('form').submit(function(){
-        var temp = [myNick , $("#boxMessage").val()];
+        var temp = [date_time(), myNick , $("#boxMessage").val()];
         socket.emit("send chat message", temp);
         $("#boxMessage").val("");
         imTyping = false;
@@ -121,9 +121,9 @@
 
       socket.on('chat message', function(msg){
         if (msg[0] == myNick)
-           $("#messages").append("<li><p align='right'>"+msg[1]+"</p>");
+           $("#messages").append("<li><p align='right'>"+msg[0]+ ' '+msg[2]+"</p>");
         else
-           $("#messages").append("<li><b><p align='left'>"+msg[0]+":</b> "+msg[1]+"</p>");
+           $("#messages").append("<li><b><p align='left'>"+msg[0]+":</b> "+msg[1]+' '+msg[2]+"</p>");
       });
 
       socket.on('info', function(inf){
@@ -156,6 +156,34 @@
             item.innerHTML = u[i];
             list.appendChild(item);
         }
+      }
+
+      function date_time()
+      {
+        date = new Date;
+        year = date.getFullYear();
+        month = date.getMonth();
+        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'Jully', 'August', 'September', 'October', 'November', 'December');
+        d = date.getDate();
+        day = date.getDay();
+        days = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+        h = date.getHours();
+        if(h<10)
+        {
+                h = "0"+h;
+        }
+        m = date.getMinutes();
+        if(m<10)
+        {
+                m = "0"+m;
+        }
+        s = date.getSeconds();
+        if(s<10)
+        {
+                s = "0"+s;
+        }
+        result = ''+days[day]+' '+months[month]+' '+d+' '+year+' '+h+':'+m+':'+s;
+        return result
       }
 
       $('#boxMessage').on('input', function() {
