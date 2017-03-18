@@ -19,7 +19,7 @@ function setUserTyping(index) {
   for (let i = 0; i < clients.length; i += 1) {
     usersList[i] = clients[i].n;
   }
-  usersList[index] = `💬 + ${clients[index].n}`;
+  usersList[index] = `💬 ${clients[index].n}`;
   return usersList;
 }
 
