@@ -111,121 +111,120 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var objDiv = document.getElementById("msg_sec");
-      var usersList = [];
-      var myNick = "";
-      imTyping = false;
+      const objDiv = document.getElementById('msg_sec');
+      // const usersList = [];
+      let myNick = '';
+      let imTyping = false;
 
-      var socket = io();
+      const socket = io();
 
-      socket.on("connect", function(e) {
-        socket.emit("start");
+      function setMyName() {
+        myNick = document.getElementById('boxNick').value;
+        const list = document.getElementById('ulist');
+        for (let i = 0; i < list.childElementCount; i += 1) {
+          if (myNick === list.children.item(i).innerHTML) {
+            alert(`${myNick} is taken!!!`);
+            return;
+          }
+        }
+        socket.emit('set nick', myNick);
+
+        // delete input and button after nickname is entered
+        document.getElementById('boxNick').outerHTML = '';
+        document.getElementById('buttonNick').outerHTML = '';
+
+        document.getElementById('boxMessage').disabled = false;
+        document.getElementById('buttonMessage').disabled = false;
+      }
+
+      function updateUserList(u) {
+        const list = document.getElementById('ulist');
+        list.innerHTML = '';
+
+        for (let i = 0; i < u.length; i += 1) {
+          const item = document.createElement('li');
+          if (u[i] === myNick) {
+            item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
+          } else {
+            item.innerHTML = u[i];
+          }
+          list.appendChild(item);
+        }
+      }
+
+      function dateTime() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'Jully', 'August', 'September', 'October', 'November', 'December'];
+        const d = date.getDate();
+        const day = date.getDay();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        let h = date.getHours();
+        let m = date.getMinutes();
+        let s = date.getSeconds();
+        if (h < 10) {
+          h = `0${h}`;
+        }
+        if (m < 10) {
+          m = `0${m}`;
+        }
+        if (s < 10) {
+          s = `0${s}`;
+        }
+        const result = `${days[day]} ${months[month]} ${d} ${year} ${h}:${m}:${s}`;
+        return result;
+      }
+
+      socket.on('connect', () => {
+        socket.emit('start');
       });
 
-      socket.on('nick', function(nick) {
+      socket.on('nick', (nick) => {
         myNick = nick;
       });
 
-      $('form').submit(function() {
-        var temp = [date_time(), myNick , $("#boxMessage").val()];
-        socket.emit("send chat message", temp);
-        $("#boxMessage").val("");
+      $('form').submit(() => {
+        const temp = [dateTime(), myNick, $('#boxMessage').val()];
+        socket.emit('send chat message', temp);
+        $('#boxMessage').val('');
         imTyping = false;
-        socket.emit("not typing");
+        socket.emit('not typing');
         return false;
       });
 
-      socket.on('chat message', function(msg) {
-        if (msg[1] == myNick) {
-          $("#messages").append("<li><p align='right'>"+msg[2]+"</p></br></li>");
-          $("#messages").append("<li><p class='time' align='right'>"+msg[0]+"</p></li>");
+      socket.on('chat message', (msg) => {
+        if (msg[1] === myNick) {
+          $('#messages').append(`<li><p align='right'>${msg[2]}</p></br></li>`);
+          $('#messages').append(`<li><p class='time' align='right'>${msg[0]}</p></li>`);
         } else {
-          $("#messages").append("<li><b><p align='left'>"+msg[1]+":</b> "+msg[2]+"</p></li>");
-          $("#messages").append("<li><p class='time' align='left'>"+msg[0]+"</p></li>");
+          $('#messages').append(`<li><b><p align='left'>${msg[1]}:</b> ${msg[2]}</p></li>`);
+          $('#messages').append(`<li><p class='time' align='left'>${msg[0]}</p></li>`);
         }
         objDiv.scrollTop = objDiv.scrollHeight;
       });
 
-      socket.on('info', function(inf) {
-        $('#messages').append("<li class='inf'><i>" + inf + "</i></li>");
+      socket.on('info', (inf) => {
+        $('#messages').append(`<li class='inf'><i>${inf}</i></li>`);
       });
 
-      socket.on('users list', function(usersList) {
+      socket.on('users list', (usersList) => {
         updateUserList(usersList);
       });
 
-      socket.on('typing signal', function(usersList) {
+      socket.on('typing signal', (usersList) => {
         updateUserList(usersList);
       });
 
-      function setMyName() {
-        myNick = document.getElementById("boxNick").value;
-        var list = document.getElementById("ulist")
-        for (var i = 0; i < list.childElementCount; i++) {
-          if (myNick == list.children.item(i).innerHTML) {
-            alert(myNick + " is taken!!!")
-            return;
-          }
-        }
-        socket.emit("set nick", myNick);
-
-        // delete input and button after nickname is entered
-        document.getElementById("boxNick").outerHTML='';
-        document.getElementById("buttonNick").outerHTML='';
-
-        document.getElementById("boxMessage").disabled=false;
-        document.getElementById("buttonMessage").disabled=false;
-      }
-
-      function updateUserList(u) {
-        var list = document.getElementById("ulist");
-        list.innerHTML = "";
-
-        for (var i = 0; i < u.length; i++ ) {
-          var item = document.createElement("li");
-          if (u[i] == myNick)
-            item.innerHTML = "<b>" + u[i] + "</b> <i>(You)</i>";
-          else
-            item.innerHTML = u[i];
-          list.appendChild(item);    
-        }
-      }
-
-      function date_time()
-      {
-        date = new Date;
-        year = date.getFullYear();
-        month = date.getMonth();
-        months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'Jully', 'August', 'September', 'October', 'November', 'December');
-        d = date.getDate();
-        day = date.getDay();
-        days = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-        h = date.getHours();
-        if(h<10) {
-          h = "0"+h;
-        }
-        m = date.getMinutes();
-        if(m<10) {
-          m = "0"+m;
-        }
-        s = date.getSeconds();
-        if(s<10) {
-          s = "0"+s;
-        }
-        result = ''+days[day]+' '+months[month]+' '+d+' '+year+' '+h+':'+m+':'+s;
-        return result
-      }
-
-      $('#boxMessage').on('input', function() {
-        if ( $('#boxMessage').val().length != "" && imTyping == false ){
-            socket.emit("typing");
-            imTyping = true;
-        } else if ( $('#boxMessage').val() == "" ) {
-            socket.emit("not typing");
-            imTyping = false;
+      $('#boxMessage').on('input', () => {
+        if ($('#boxMessage').val() !== '' && imTyping === false) {
+          socket.emit('typing');
+          imTyping = true;
+        } else if ($('#boxMessage').val() === '') {
+          socket.emit('not typing');
+          imTyping = false;
         }
       });
-
     </script>
   </body>
 </html>
