@@ -1,4 +1,9 @@
 {
+<<<<<<< HEAD
     "vsicons.presets.angular": false,
     "eslint.enable": true,
   }
+=======
+    "vsicons.presets.angular": false
+}
+>>>>>>> 542a5c1eaf34d9f003b2e6dc8e58f818411373c5
