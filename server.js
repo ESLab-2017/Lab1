@@ -2,6 +2,10 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const ip = require('ip');
+const MongoClient = require('mongodb').MongoClient
+const assert = require('assert');
+
+const url = 'mongodb://test:test@ds060009.mlab.com:60009/eslab1_chat_room';
 
 const clients = [];
 let incr = 1;
@@ -28,42 +32,46 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  clients.push(socket);
+  MongoClient.connect(url, function (err, db) {
+    const userProfile = db.collection('userProfile');
+    clients.push(socket);
 
-  socket.on('start', () => {
-    socket.emit('nick', `guest${incr}`);
-    clients[clients.indexOf(socket)].n = `guest${incr}`;
-    incr += 1;
-    io.emit('users list', getUsersList());
-  });
+    socket.on('start', () => {
+      socket.emit('nick', `guest${incr}`);
+      clients[clients.indexOf(socket)].n = `guest${incr}`;
+      incr += 1;
+      io.emit('users list', getUsersList());
+    });
 
-  socket.on('send chat message', (msg) => {
-    io.emit('chat message', msg);
-  });
+    socket.on('send chat message', (msg) => {
+      io.emit('chat message', msg);
+    });
 
-  socket.on('set nick', (nick) => {
-    io.emit('info', `New user: ${nick}`); // console.log(nick);
-    clients[clients.indexOf(socket)].n = nick; // console.log(clients[clients.indexOf(socket)].n);
-    io.emit('users list', getUsersList()); // console.log(getUsersList());
-  });
+    socket.on('set nick', (nick) => {
+      // userProfile.insert([{ name: nick }]);
+      io.emit('info', `New user: ${nick}`); // console.log(nick);
+      clients[clients.indexOf(socket)].n = nick; // console.log(clients[clients.indexOf(socket)].n);
+      io.emit('users list', getUsersList()); // console.log(getUsersList());
+    });
 
-  socket.on('typing', () => {
-    io.emit('typing signal', setUserTyping(clients.indexOf(socket))); // console.log(setUserTyping(clients.indexOf(socket)));
-  });
+    socket.on('typing', () => {
+      io.emit('typing signal', setUserTyping(clients.indexOf(socket))); // console.log(setUserTyping(clients.indexOf(socket)));
+    });
 
-  socket.on('not typing', () => {
-    io.emit('typing signal', getUsersList()); // console.log(getUsersList());
-  });
+    socket.on('not typing', () => {
+      io.emit('typing signal', getUsersList()); // console.log(getUsersList());
+    });
 
-  socket.on('disconnect', () => {
-    if (clients[clients.indexOf(socket)].n == null) {
-      // console.log('Guest disconnect!');
-    } else {
-      // console.log(clients[clients.indexOf(socket)].n +' disconnect!');
-      io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
-    }
-    clients.splice(clients.indexOf(socket), 1); // clientIndex, 1);
-    io.emit('users list', getUsersList());
+    socket.on('disconnect', () => {
+      if (clients[clients.indexOf(socket)].n == null) {
+        // console.log('Guest disconnect!');
+      } else {
+        // console.log(clients[clients.indexOf(socket)].n +' disconnect!');
+        io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
+      }
+      clients.splice(clients.indexOf(socket), 1); // clientIndex, 1);
+      io.emit('users list', getUsersList());
+    });
   });
 });
 
