@@ -3,9 +3,11 @@
   "version": "0.0.1",
   "description": "Improved Socket.IO Chat Example",
   "dependencies": {
+    "assert": "^1.4.1",
     "express": "4.10.2",
-    "socket.io": "1.2.0",
-    "ip": "^1.0.0"
+    "ip": "^1.0.0",
+    "mongodb": "^2.2.25",
+    "socket.io": "1.2.0"
   },
   "devDependencies": {
     "eslint": "^3.17.1",
