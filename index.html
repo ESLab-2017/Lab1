@@ -132,7 +132,7 @@
     <input id="boxNick" type="text" placeholder="Username" size="13" />
     <input id="boxPass" type="password" placeholder="Password" size="13" />
     <button type="submit" id="buttonNick"
-      onClick="setMyName()">Set</button>
+      onClick="setMyName()">Login</button>
     <ul id="ulist"></ul>
   </aside>
 
@@ -142,6 +142,7 @@
     const objDiv = document.getElementById('msg_sec');
     // const usersList = [];
     let userCred = { username: '', password: '' };
+    var myNick = "";
     let imTyping = false;
 
     const socket = io();
@@ -149,6 +150,7 @@
     function setMyName() {
       userCred.username = document.getElementById('boxNick').value;
       userCred.password = document.getElementById('boxPass').value;
+      myNick = userCred.username;
       const list = document.getElementById('ulist');
       for (let i = 0; i < list.childElementCount; i += 1) {
         if (userCred.username === list.children.item(i).innerHTML) {
@@ -160,6 +162,7 @@
 
       // delete input and button after nickname is entered
       document.getElementById('boxNick').outerHTML = '';
+      document.getElementById('boxPass').outerHTML = '';
       document.getElementById('buttonNick').outerHTML = '';
 
       document.getElementById('boxMessage').disabled = false;
@@ -172,7 +175,7 @@
 
       for (let i = 0; i < u.length; i += 1) {
         const item = document.createElement('li');
-        if (u[i] === user) {
+        if (u[i] === userCred.username) {
           item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
         } else {
           item.innerHTML = u[i];
@@ -212,11 +215,12 @@
     });
 
     socket.on('nick', (nick) => {
-      user = nick;
+      console.log("into nick: " + nick);
+      myNick = nick;
     });
 
     $('form').submit(() => {
-      const temp = [dateTime(), user, $('#boxMessage').val()];
+      const temp = [dateTime(), myNick, $('#boxMessage').val()];
       socket.emit('send chat message', temp);
       $('#boxMessage').val('');
       imTyping = false;
@@ -225,7 +229,8 @@
     });
 
     socket.on('chat message', (msg) => {
-      if (msg[1] === user) {
+      console.log("myNick = " + myNick + ", msg[1] = " + msg[1]);
+      if (msg[1] === myNick) {
         $('#messages').append(`<li><p align='right'>${msg[2]}</p></br></li>`);
         $('#messages').append(`<li><p class='time' align='right'>${msg[0]}</p></li>`);
       } else {

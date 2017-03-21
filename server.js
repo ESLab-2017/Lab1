@@ -44,16 +44,21 @@ io.on('connection', (socket) => {
     socket.on('send chat message', (msg) => {
       io.emit('chat message', msg);
     });
-    MongoClient.connect(url, function (err, db) {
-      const userProfile = db.collection('userProfile');
-      assert.equal(null, err);
-      console.log("Connected correctly to server");
+    
       socket.on('set nick', (nick) => {
-        userProfile.insert([{ username: nick.username, password: nick.password }]);
+        MongoClient.connect(url, function (err, db) {
+          const userProfile = db.collection('userProfile');
+          assert.equal(null, err);
+          console.log("Connected correctly to server");
+          userProfile.insert([{ username: nick.username, password: nick.password }]);
+        });
         io.emit('info', `New user: ${nick.username}`); // console.log(nick);
+        //io.emit('nick', nick.username);
+        //console.log('nick.username = ' + nick.username);
+        //console.log('clients[clients.indexOf(socket)].n = ' + clients[clients.indexOf(socket)].n);
         clients[clients.indexOf(socket)].n = nick.username; // console.log(clients[clients.indexOf(socket)].n);
+        //console.log('clients[clients.indexOf(socket)].n = ' + clients[clients.indexOf(socket)].n);
         io.emit('users list', getUsersList()); // console.log(getUsersList());
-      });
     });
 
     socket.on('typing', () => {
