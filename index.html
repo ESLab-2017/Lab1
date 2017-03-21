@@ -99,11 +99,11 @@
     aside input {
       border: 0;
       padding: 10px;
-      width: 70%;
+      width: 100%;
     }
 
     aside button {
-      width: 30%;
+      width: 100%;
       background: #639ff2;
       border: none;
       padding: 10px;
@@ -129,7 +129,9 @@
   </div>
   <aside>
     <h2 id="members">Members</h2>
-    <input id="boxNick" type="text" placeholder="Type your nickname..." size="13" /><button type="submit" id="buttonNick"
+    <input id="boxNick" type="text" placeholder="Type your username..." size="13" />
+    <input id="boxPass" type="password" placeholder="Type your password..." size="13" />
+    <button type="submit" id="buttonNick"
       onClick="setMyName()">Set</button>
     <ul id="ulist"></ul>
   </aside>
@@ -139,21 +141,22 @@
   <script>
     const objDiv = document.getElementById('msg_sec');
     // const usersList = [];
-    let myNick = '';
+    let userCred = { username: '', password: '' };
     let imTyping = false;
 
     const socket = io();
 
     function setMyName() {
-      myNick = document.getElementById('boxNick').value;
+      userCred.username = document.getElementById('boxNick').value;
+      userCred.password = document.getElementById('boxPass').value;
       const list = document.getElementById('ulist');
       for (let i = 0; i < list.childElementCount; i += 1) {
-        if (myNick === list.children.item(i).innerHTML) {
-          alert(`Nickname \"${myNick}\" is taken.`);
+        if (userCred.username === list.children.item(i).innerHTML) {
+          alert(`Username \"${userCred.username}\" is taken.`);
           return;
         }
       }
-      socket.emit('set nick', myNick);
+      socket.emit('set nick', userCred);
 
       // delete input and button after nickname is entered
       document.getElementById('boxNick').outerHTML = '';
@@ -169,7 +172,7 @@
 
       for (let i = 0; i < u.length; i += 1) {
         const item = document.createElement('li');
-        if (u[i] === myNick) {
+        if (u[i] === user) {
           item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
         } else {
           item.innerHTML = u[i];
@@ -209,11 +212,11 @@
     });
 
     socket.on('nick', (nick) => {
-      myNick = nick;
+      user = nick;
     });
 
     $('form').submit(() => {
-      const temp = [dateTime(), myNick, $('#boxMessage').val()];
+      const temp = [dateTime(), user, $('#boxMessage').val()];
       socket.emit('send chat message', temp);
       $('#boxMessage').val('');
       imTyping = false;
@@ -222,7 +225,7 @@
     });
 
     socket.on('chat message', (msg) => {
-      if (msg[1] === myNick) {
+      if (msg[1] === user) {
         $('#messages').append(`<li><p align='right'>${msg[2]}</p></br></li>`);
         $('#messages').append(`<li><p class='time' align='right'>${msg[0]}</p></li>`);
       } else {
