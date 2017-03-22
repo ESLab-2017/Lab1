@@ -1,0 +1,189 @@
+html {
+  height: 100%;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  height: 100%;
+  font: 13px 'Ubuntu', sans-serif;
+  margin: 0;
+  min-height: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  overflow: hidden;
+}
+
+form {
+  bottom: 0;
+  width: 100%;
+}
+
+form input {
+  border: 0;
+  padding: 10px;
+  width: 80%;
+}
+
+form button {
+  width: 19.75%;
+  background: #2a87ff;
+  color: #fff;
+  border: none;
+  padding: 10px;
+}
+
+header {
+  background: #3b5998;
+  color: #fff;
+  text-align: center;
+  height: 10%;
+}
+
+section {
+  background: #f7f7f7;
+  height: 200%;
+  overflow-y: auto;
+  border-bottom: 33px;
+}
+
+footer {
+  height: 10%;
+  background: #ffffff;
+}
+
+aside {
+  background: #dfe3ee;
+  flex: 1;
+}
+
+aside input {
+  border: 0;
+  padding: 10px;
+  width: 100%;
+}
+
+aside button {
+  width: 100%;
+  background: #639ff2;
+  border: none;
+  padding: 10px;
+}
+
+ul {
+  list-style: none;
+  word-wrap: break-word;
+}
+
+/* Pages */
+
+.pages {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.page {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+/* Login Page */
+
+.login.page {
+  background-color: #3b5998;
+}
+
+.login.page .form {
+  height: 100px;
+  margin-top: -100px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  width: 100%;
+}
+
+.login.page .form .usernameInput, .passwordInput {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #fff;
+  outline: none;
+  padding-bottom: 15px;
+  text-align: center;
+  width: 400px;
+}
+
+.login.page .form {
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.login.page .title {
+  font-size: 200%;
+}
+
+.login.page .usernameInput, .passwordInput {
+  font-size: 200%;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+}
+
+.login.page .title, .login.page .usernameInput, .passwordInput {
+  color: #fff;
+  font-weight: 100;
+}
+
+.login.page .twobutton {
+  width: 420px;
+}
+
+.login.page .twobutton .loginButton, .registerButton {
+  width: 200px;
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-weight: 200;
+}
+
+/* Chat page */
+
+.chat.page {
+  display: none;
+}
+
+#messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#messages li {
+  box-sizing: border-box;
+  height: 25px;
+  padding: 5px 10px;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 200px);
+}
+
+#members {
+  text-align: center;
+}
+
+.time {
+  font-size: 6px;
+  color: #8E8E8E;
+}

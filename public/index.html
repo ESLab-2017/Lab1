@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ESLab1 Chat Room</title>
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <ul class="pages">
+    <li class="chat page">
+      <div id="container">
+        <header>
+          <h2>Messages</h2>
+        </header>
+        <section id="msg_sec">
+          <ul id="messages"></ul>
+        </section>
+        <footer>
+          <form action="">
+            <input class="boxMessage" type="text" autocomplete="off" placeholder="Type a messages..." />
+            <button
+              id="buttonMessage">Send</button>
+          </form>
+        </footer>
+      </div>
+      <aside>
+        <h2 id="members">Members</h2>
+        <!--<input id="boxName" type="text" placeholder="Type your username..." size="13" />
+        <input id="boxPass" type="password" placeholder="Type your password..." size="13" />
+        <button type="submit" id="buttonNick"
+          onClick="setMyName()">Set</button>-->
+        <ul id="ulist"></ul>
+      </aside>
+    </li>
+    <li class="login page">
+      <div class="form">
+        <h3 class="title">Welcome</h3>
+        <input class="usernameInput" type="text" placeholder="USERNAME" maxlength="14" />
+        <input class="passwordInput" type="password" placeholder="PASSWORD" maxlength="14" />
+        <div class="twobutton">
+          <button type="submit" class="loginButton">Login in</button>
+          <button type="submit" class="registerButton">Register</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="/main.js"></script>
+</body>
+</html>
