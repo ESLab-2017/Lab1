@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
         MongoClient.connect(url, function (err, db) {
           const userProfile = db.collection('userProfile');
           assert.equal(null, err);
-          console.log("Connected correctly to server");
+          console.log(nick.username + " connected to server.");
           userProfile.insert([{ username: nick.username, password: nick.password }]);
         });
         io.emit('info', `New user: ${nick.username}`); // console.log(nick);

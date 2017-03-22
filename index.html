@@ -102,11 +102,20 @@
       width: 100%;
     }
 
-    aside button {
-      width: 100%;
+    #buttonNick {
+      width: 50%;
       background: #639ff2;
       border: none;
       padding: 10px;
+      color: #fff;
+    }
+
+    #buttonReg {
+      width: 50%;
+      background: #fff;
+      border: none;
+      padding: 10px;
+      color: #639ff2;
     }
   </style>
 </head>
@@ -131,8 +140,7 @@
     <h2 id="members">Members</h2>
     <input id="boxNick" type="text" placeholder="Username" size="13" />
     <input id="boxPass" type="password" placeholder="Password" size="13" />
-    <button type="submit" id="buttonNick"
-      onClick="setMyName()">Login</button>
+    <button type="submit" id="buttonNick">Login</button><button type="submit" id="buttonReg" onClick="setMyName()">Register</button>
     <ul id="ulist"></ul>
   </aside>
 
@@ -164,6 +172,7 @@
       document.getElementById('boxNick').outerHTML = '';
       document.getElementById('boxPass').outerHTML = '';
       document.getElementById('buttonNick').outerHTML = '';
+      document.getElementById('buttonReg').outerHTML = '';
 
       document.getElementById('boxMessage').disabled = false;
       document.getElementById('buttonMessage').disabled = false;
@@ -215,7 +224,7 @@
     });
 
     socket.on('nick', (nick) => {
-      console.log("into nick: " + nick);
+      //console.log("into nick: " + nick);
       myNick = nick;
     });
 
@@ -229,7 +238,7 @@
     });
 
     socket.on('chat message', (msg) => {
-      console.log("myNick = " + myNick + ", msg[1] = " + msg[1]);
+      //console.log("myNick = " + myNick + ", msg[1] = " + msg[1]);
       if (msg[1] === myNick) {
         $('#messages').append(`<li><p align='right'>${msg[2]}</p></br></li>`);
         $('#messages').append(`<li><p class='time' align='right'>${msg[0]}</p></li>`);
