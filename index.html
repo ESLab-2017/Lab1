@@ -137,10 +137,10 @@
     </footer>
   </div>
   <aside>
-    <h2 id="members">Members</h2>
+    <h2 id="members">Login</h2>
     <input id="boxNick" type="text" placeholder="Username" size="13" />
     <input id="boxPass" type="password" placeholder="Password" size="13" />
-    <button type="submit" id="buttonNick">Login</button><button type="submit" id="buttonReg" onClick="setMyName()">Register</button>
+    <button type="submit" id="buttonNick">Login</button><button type="submit" id="buttonReg" onClick="register()">Register</button>
     <ul id="ulist"></ul>
   </aside>
 
@@ -155,7 +155,7 @@
 
     const socket = io();
 
-    function setMyName() {
+    function register() {
       userCred.username = document.getElementById('boxNick').value;
       userCred.password = document.getElementById('boxPass').value;
       myNick = userCred.username;
@@ -166,9 +166,34 @@
           return;
         }
       }
-      socket.emit('set nick', userCred);
+      socket.emit('register nick', userCred);
 
       // delete input and button after nickname is entered
+      document.getElementById('members').outerHTML = '<h2 id="members">Members</h2>';
+      document.getElementById('boxNick').outerHTML = '';
+      document.getElementById('boxPass').outerHTML = '';
+      document.getElementById('buttonNick').outerHTML = '';
+      document.getElementById('buttonReg').outerHTML = '';
+
+      document.getElementById('boxMessage').disabled = false;
+      document.getElementById('buttonMessage').disabled = false;
+    }
+
+    function login() {
+      userCred.username = document.getElementById('boxNick').value;
+      userCred.password = document.getElementById('boxPass').value;
+      myNick = userCred.username;
+      const list = document.getElementById('ulist');
+      for (let i = 0; i < list.childElementCount; i += 1) {
+        if (userCred.username === list.children.item(i).innerHTML) {
+          alert(`Username \"${userCred.username}\" is taken.`);
+          return;
+        }
+      }
+      socket.emit('login nick', userCred);
+
+      // delete input and button after nickname is entered
+      document.getElementById('members').outerHTML = '<h2 id="members">Members</h2>';
       document.getElementById('boxNick').outerHTML = '';
       document.getElementById('boxPass').outerHTML = '';
       document.getElementById('buttonNick').outerHTML = '';
