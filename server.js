@@ -16,9 +16,6 @@ http.listen(8080, () => {
   console.log(`listening on localhost:8080 and ${ip.address()}:8080`);
 });
 
-// app.get('/', (req, res) => {
-//   res.sendFile(`${__dirname}/index.html`);
-// });
 app.use(express.static(`${__dirname}/public`));
 
 function getUsersList() {
@@ -62,6 +59,7 @@ function findDocuments(db, wtfind, callback) {
 }
 
 io.on('connection', (socket) => {
+  let addedUser = false;
   clients.push(socket);
 
   socket.on('start', () => {
@@ -71,64 +69,39 @@ io.on('connection', (socket) => {
     io.emit('users list', getUsersList());
   });
 
-<<<<<<< HEAD
   socket.on('send chat message', (msg) => {
     io.emit('chat message', msg);
   });
 
   socket.on('login', (user) => {
+    if (addedUser) return;
+    console.log('login');
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
       console.log('Connected correctly to server');
       findDocuments(db, { username: user.username }, (doc) => {
-        if (!doc[0]) {
-          insertDocuments(db, { username: user.username, password: user.password }, () => {});
-          socket.emit('login entry', true);
-          io.emit('info', `New user: ${user.username}`);
-          clients[clients.indexOf(socket)].n = user.username;
-          io.emit('users list', getUsersList());
-        } else if (doc[0].password !== user.password) {
+        if (!doc[0] || doc[0].password !== user.password) {
           socket.emit('login entry', false);
         } else {
           socket.emit('login entry', true);
+          addedUser = true;
+          socket.username = user.username;
           io.emit('info', `New user: ${user.username}`);
           clients[clients.indexOf(socket)].n = user.username;
           io.emit('users list', getUsersList());
+          io.emit('user joined', {
+            username: socket.username,
+            numUsers: clients.length,
+          });
         }
         db.close();
       });
-=======
-    socket.on('send chat message', (msg) => {
-      io.emit('chat message', msg);
-    });
-    
-    socket.on('register nick', (nick) => {
-        MongoClient.connect(url, function (err, db) {
-          const userProfile = db.collection('userProfile');
-          assert.equal(null, err);
-          console.log("Connected correctly to server");
-          userProfile.insert([{ username: nick.username, password: nick.password }]);
-        });
-        io.emit('info', `New user: ${nick.username}`); // console.log(nick);
-        clients[clients.indexOf(socket)].n = nick.username; // console.log(clients[clients.indexOf(socket)].n);
-        io.emit('users list', getUsersList()); // console.log(getUsersList());
-    });
-
-    socket.on('login nick', (nick) => {
-        MongoClient.connect(url, function (err, db) {
-          const userProfile = db.collection('userProfile');
-          assert.equal(null, err);
-          console.log("Connected correctly to server");
-          userProfile.insert([{ username: nick.username, password: nick.password }]);
-        });
-        io.emit('info', `New user: ${nick.username}`); // console.log(nick);
-        clients[clients.indexOf(socket)].n = nick.username; // console.log(clients[clients.indexOf(socket)].n);
-        io.emit('users list', getUsersList()); // console.log(getUsersList());
->>>>>>> 86d78be8b784b0e5cd506e213b418cdc0d403206
     });
   });
 
   socket.on('register', (user) => {
+    if (addedUser) return;
+
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
       console.log('Connected correctly to server');
@@ -136,39 +109,42 @@ io.on('connection', (socket) => {
         if (!doc[0]) {
           insertDocuments(db, { username: user.username, password: user.password }, () => {});
           socket.emit('login entry', true);
+          addedUser = true;
+          socket.username = user.username;
           io.emit('info', `New user: ${user.username}`);
           clients[clients.indexOf(socket)].n = user.username;
           io.emit('users list', getUsersList());
-        } else if (doc[0].password !== user.password) {
-          socket.emit('login entry', false);
+          io.emit('user joined', {
+            username: socket.username,
+            numUsers: clients.length,
+          });
         } else {
-          socket.emit('login entry', true);
-          io.emit('info', `New user: ${user.username}`);
-          clients[clients.indexOf(socket)].n = user.username;
-          io.emit('users list', getUsersList());
+          socket.emit('login entry', false);
         }
         db.close();
       });
     });
   });
 
-
   socket.on('typing', () => {
-    io.emit('typing signal', setUserTyping(clients.indexOf(socket))); // console.log(setUserTyping(clients.indexOf(socket)));
+    io.emit('typing signal', setUserTyping(clients.indexOf(socket)));
+    io.emit('typing', {
+      username: socket.username,
+    });
   });
 
   socket.on('not typing', () => {
     io.emit('typing signal', getUsersList());
+    io.emit('stop typing', {
+      username: socket.username,
+    });
   });
 
   socket.on('disconnect', () => {
-    if (clients[clients.indexOf(socket)].n == null) {
-      // console.log('Guest disconnect!');
-    } else {
-      // console.log(clients[clients.indexOf(socket)].n +' disconnect!');
+    if (addedUser) {
       io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
+      clients.splice(clients.indexOf(socket), 1); // clientIndex, 1);
+      io.emit('users list', getUsersList());
     }
-    clients.splice(clients.indexOf(socket), 1); // clientIndex, 1);
-    io.emit('users list', getUsersList());
   });
 });

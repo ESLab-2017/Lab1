@@ -8,30 +8,20 @@
 </head>
 <body>
   <ul class="pages">
-    <li class="chat page">
-      <div id="container">
-        <header>
-          <h2>Messages</h2>
-        </header>
-        <section id="msg_sec">
-          <ul id="messages"></ul>
-        </section>
-        <footer>
-          <form action="">
-            <input class="boxMessage" type="text" autocomplete="off" placeholder="Type a messages..." />
-            <button
-              id="buttonMessage">Send</button>
-          </form>
-        </footer>
+    <li class="new page">
+      <div class = "chat page">
+        <div class="leftside">
+          <header><h2>Messages</h2></header>
+          <div class="chatArea">
+            <ul id="messages"></ul>
+          </div>
+          <input class="inputMessage" type="text" autocomplete="off" placeholder="Say something" />
+        </div>
+        <aside>
+          <h2 class="members">Members</h2>
+          <ul class="ulist"></ul>
+        </aside>
       </div>
-      <aside>
-        <h2 id="members">Members</h2>
-        <!--<input id="boxName" type="text" placeholder="Type your username..." size="13" />
-        <input id="boxPass" type="password" placeholder="Type your password..." size="13" />
-        <button type="submit" id="buttonNick"
-          onClick="setMyName()">Set</button>-->
-        <ul id="ulist"></ul>
-      </aside>
     </li>
     <li class="login page">
       <div class="form">
@@ -39,7 +29,7 @@
         <input class="usernameInput" type="text" placeholder="USERNAME" maxlength="14" />
         <input class="passwordInput" type="password" placeholder="PASSWORD" maxlength="14" />
         <div class="twobutton">
-          <button type="submit" class="loginButton">Login in</button>
+          <button type="submit" class="loginButton">Login</button>
           <button type="submit" class="registerButton">Register</button>
         </div>
       </div>

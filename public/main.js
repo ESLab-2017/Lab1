@@ -1,15 +1,15 @@
 $(() => {
   const objDiv = $('#msg_sec');
-  // const objDiv = document.getElementById('msg_sec');
+  const $window = $(window);
   const uneInput = $('.usernameInput');
   const pwdInput = $('.passwordInput');
-  const loginBtn = $('loginButton');
-  const registerBtn = $('registerButton');
+  const loginBtn = $('.loginButton');
+  const registerBtn = $('.registerButton');
   const mesInput = $('.boxMessage');
   const messages = $('#messages');
 
   const loginPage = $('.login.page');
-  const chatPage = $('.chat.page');
+  const chatPage = $('.new.page');
 
   const userCred = { username: '', password: '' };
   let typing = false;
@@ -25,8 +25,6 @@ $(() => {
   function login() {
     userCred.username = cleanInput(uneInput.val().trim());
     userCred.password = cleanInput(pwdInput.val().trim());
-    console.log(userCred.username);
-    console.log(userCred.password);
     if (userCred.username && userCred.password) {
       socket.emit('login', userCred);
       socket.on('login entry', (suc) => {
@@ -45,8 +43,6 @@ $(() => {
   function register() {
     userCred.username = cleanInput(uneInput.val().trim());
     userCred.password = cleanInput(pwdInput.val().trim());
-    console.log(userCred.username);
-    console.log(userCred.password);
     if (userCred.username && userCred.password) {
       socket.emit('register', userCred);
       socket.on('login entry', (suc) => {
@@ -56,11 +52,11 @@ $(() => {
           loginPage.off('click');
           curInput = mesInput.focus();
         } else {
-          alert('Incorrect username or password!');
+          alert('Username is taken!');
         }
       });
     }
-  }  
+  }
 
   function updateUserList(u) {
     const list = document.getElementById('ulist');
@@ -103,12 +99,22 @@ $(() => {
     return result;
   }
 
-  loginBtn.on('click', () => {
+  loginBtn.click(() => {
     login();
   });
 
-  registerBtn.on('click', () => {
+  registerBtn.click(() => {
     register();
+  });
+
+  $('#boxMessage').on('input', () => {
+    if ($('#boxMessage').val() !== '' && typing === false) {
+      socket.emit('typing');
+      typing = true;
+    } else if ($('#boxMessage').val() === '') {
+      socket.emit('not typing');
+      typing = false;
+    }
   });
 
   socket.on('connect', () => {
@@ -149,15 +155,5 @@ $(() => {
 
   socket.on('typing signal', (usersList) => {
     updateUserList(usersList);
-  });
-
-  $('#boxMessage').on('input', () => {
-    if ($('#boxMessage').val() !== '' && typing === false) {
-      socket.emit('typing');
-      typing = true;
-    } else if ($('#boxMessage').val() === '') {
-      socket.emit('not typing');
-      typing = false;
-    }
   });
 });
