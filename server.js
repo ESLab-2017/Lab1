@@ -71,6 +71,7 @@ io.on('connection', (socket) => {
     io.emit('users list', getUsersList());
   });
 
+<<<<<<< HEAD
   socket.on('send chat message', (msg) => {
     io.emit('chat message', msg);
   });
@@ -96,6 +97,34 @@ io.on('connection', (socket) => {
         }
         db.close();
       });
+=======
+    socket.on('send chat message', (msg) => {
+      io.emit('chat message', msg);
+    });
+    
+    socket.on('register nick', (nick) => {
+        MongoClient.connect(url, function (err, db) {
+          const userProfile = db.collection('userProfile');
+          assert.equal(null, err);
+          console.log("Connected correctly to server");
+          userProfile.insert([{ username: nick.username, password: nick.password }]);
+        });
+        io.emit('info', `New user: ${nick.username}`); // console.log(nick);
+        clients[clients.indexOf(socket)].n = nick.username; // console.log(clients[clients.indexOf(socket)].n);
+        io.emit('users list', getUsersList()); // console.log(getUsersList());
+    });
+
+    socket.on('login nick', (nick) => {
+        MongoClient.connect(url, function (err, db) {
+          const userProfile = db.collection('userProfile');
+          assert.equal(null, err);
+          console.log("Connected correctly to server");
+          userProfile.insert([{ username: nick.username, password: nick.password }]);
+        });
+        io.emit('info', `New user: ${nick.username}`); // console.log(nick);
+        clients[clients.indexOf(socket)].n = nick.username; // console.log(clients[clients.indexOf(socket)].n);
+        io.emit('users list', getUsersList()); // console.log(getUsersList());
+>>>>>>> 86d78be8b784b0e5cd506e213b418cdc0d403206
     });
   });
 
