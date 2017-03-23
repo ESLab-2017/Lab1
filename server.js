@@ -11,7 +11,6 @@ const assert = require('assert');
 const url = 'mongodb://test:test@ds060009.mlab.com:60009/eslab1_chat_room';
 
 const clients = [];
-let incr = 1;
 
 http.listen(8080, () => {
   console.log(`listening on localhost:8080 and ${ip.address()}:8080`);
@@ -44,7 +43,6 @@ function insertDocuments(db, wtinsert, callback) {
     assert.equal(err, null);
     assert.equal(1, result.result.n);
     assert.equal(1, result.ops.length);
-    console.log('Inserted document into the collection');
     callback(result);
   });
 }
@@ -62,22 +60,13 @@ function findDocuments(db, wtfind, callback) {
 io.on('connection', (socket) => {
   let addedUser = false;
   clients.push(socket);
-  console.log('connected');
-
-  // socket.on('start', () => {
-  //   socket.emit('nick', `guest${incr}`);
-  //   clients[clients.indexOf(socket)].n = `guest${incr}`;
-  //   incr += 1;
-  //   io.emit('users list', getUsersList());
-  // });
 
   socket.on('send chat message', (msg) => {
-    io.emit('chat message', msg);
+    socket.broadcast.emit('chat message', msg);
   });
 
   socket.on('login', (user) => {
     if (addedUser) return;
-    console.log('login');
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
       console.log('Connected correctly to server');
@@ -130,14 +119,14 @@ io.on('connection', (socket) => {
 
   socket.on('typing', () => {
     io.emit('typing signal', setUserTyping(clients.indexOf(socket)));
-    io.emit('typing', {
+    socket.broadcast.emit('typing', {
       username: socket.username,
     });
   });
 
   socket.on('not typing', () => {
     io.emit('typing signal', getUsersList());
-    io.emit('stop typing', {
+    socket.broadcast.emit('stop typing', {
       username: socket.username,
     });
   });
@@ -147,6 +136,10 @@ io.on('connection', (socket) => {
       io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
       clients.splice(clients.indexOf(socket), 1);
       io.emit('users list', getUsersList());
+      socket.broadcast.emit('user left', {
+        username: socket.username,
+        numUsers: clients.length,
+      });
     }
   });
 });

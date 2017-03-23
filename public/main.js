@@ -1,8 +1,12 @@
 $(() => {
   const FADE_TIME = 150;
   const TYPING_TIMER_LENGTH = 500;
+  const COLORS = [
+    '#e21400', '#91580f', '#f8a700', '#f78b00',
+    '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
+    '#3b88eb', '#3824aa', '#a700ff', '#d300e7',
+  ];
 
-  const $objDiv = $('#msg_sec');
   const $window = $(window);
 
   const $loginPage = $('.login.page');
@@ -21,6 +25,20 @@ $(() => {
   let connected = false;
   let lastTypingTime;
   let curInput = $uneInput.focus();
+  $(document).tooltip({
+    position: {
+      my: 'center bottom-20',
+      at: 'center top',
+      using(position, feedback) {
+        $(this).css(position);
+        $('<div>')
+          .addClass('arrow')
+          .addClass(feedback.vertical)
+          .addClass(feedback.horizontal)
+          .appendTo(this);
+      },
+    },
+  });
 
   const socket = io();
 
@@ -52,6 +70,23 @@ $(() => {
     }
     const result = `${days[day]} ${months[month]} ${d} ${year} ${h}:${m}:${s}`;
     return result;
+  }
+
+  function getTypingMessages(data) {
+    return $('.typing.message').filter(function filter() {
+      return $(this).data('username') === data.username;
+    });
+  }
+
+  function getUsernameColor(username) {
+    // Compute hash code
+    let hash = 7;
+    for (let i = 0; i < username.length; i += 1) {
+      hash = (username.charCodeAt(i) + (hash << 5)) - hash;
+    }
+    // Calculate color
+    const index = Math.abs(hash % COLORS.length);
+    return COLORS[index];
   }
 
   function addMessageElement(el, options) {
@@ -101,12 +136,51 @@ $(() => {
     addMessageElement($el, options);
   }
 
+  function addChatMessage(data, options) {
+    // Don't fade the message in if there is an 'X was typing'
+    const $typingMessages = getTypingMessages(data);
+    options = options || {};
+    if ($typingMessages.length !== 0) {
+      options.fade = false;
+      $typingMessages.remove();
+    }
+
+    const typingClass = data.typing ? 'typing' : '';
+    const $messageBodyDiv = $('<span class="messageBody">')
+        .text(data.message)
+        .prop('title', data.time);
+    let $messageDiv;
+    if (data.username !== userCred.username) {
+      const $usernameDiv = $('<span class="username"/>')
+        .text(data.username)
+        .css('color', getUsernameColor(data.username));
+
+      $messageDiv = $('<li class="message"/>')
+        .data('username', data.username)
+        .addClass(typingClass)
+        .append($usernameDiv, $messageBodyDiv);
+    } else {
+      $messageDiv = $('<li class="message"/>')
+        .data('username', data.username)
+        .addClass(typingClass)
+        .addClass('right')
+        .append($messageBodyDiv);
+    }
+
+    addMessageElement($messageDiv, options);
+  }
+
   function sendMessage() {
-    const message = cleanInput($mesInput.val());
-    const temp = [dateTime(), userCred.username, message];
-    if (message && connected) {
-      socket.emit('send chat message', temp);
+    const msg = cleanInput($mesInput.val());
+    const tmp = {
+      username: userCred.username,
+      message: msg,
+      time: dateTime(),
+    };
+    if (msg && connected) {
       $mesInput.val('');
+      addChatMessage(tmp);
+      socket.emit('send chat message', tmp);
     }
   }
 
@@ -142,6 +216,20 @@ $(() => {
         }
       }, TYPING_TIMER_LENGTH);
     }
+  }
+
+  // Adds the visual chat typing message
+  function addChatTyping(data) {
+    data.typing = true;
+    data.message = 'is typing';
+    addChatMessage(data);
+  }
+
+  // Removes the visual chat typing message
+  function removeChatTyping(data) {
+    getTypingMessages(data).fadeOut(() => {
+      $(this).remove();
+    });
   }
 
   $loginBtn.click(() => {
@@ -204,18 +292,15 @@ $(() => {
   });
 
   socket.on('chat message', (msg) => {
-    if (msg[1] === userCred.username) {
-      $messages.append(`<li><p class='right'>${msg[2]}</p></br></li>`);
-      $messages.append(`<li><p class='time right'>${msg[0]}</p></li>`);
-    } else {
-      $messages.append(`<li><b><p class='left'>${msg[1]}:</b> ${msg[2]}</p></li>`);
-      $messages.append(`<li><p class='time left'>${msg[0]}</p></li>`);
-    }
-    $objDiv.scrollTop = $objDiv.scrollHeight;
+    addChatMessage(msg);
   });
 
   socket.on('info', (inf) => {
     log(inf);
+  });
+
+  socket.on('user left', (data) => {
+    log(`${data.username} left'`);
   });
 
   socket.on('users list', (usersList) => {
@@ -224,5 +309,13 @@ $(() => {
 
   socket.on('typing signal', (usersList) => {
     updateUserList(usersList);
+  });
+
+  socket.on('typing', (data) => {
+    addChatTyping(data);
+  });
+
+  socket.on('stop typing', (data) => {
+    removeChatTyping(data);
   });
 });

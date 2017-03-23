@@ -9,11 +9,13 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
-html, input {
+html,
+input {
   font-family: 'Ubuntu', sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -24,6 +26,7 @@ ul {
   word-wrap: break-word;
 }
 
+
 /* Pages */
 
 .pages {
@@ -32,6 +35,7 @@ ul {
   padding: 0;
   width: 100%;
 }
+
 
 /* Login Page */
 
@@ -54,7 +58,8 @@ ul {
   width: 100%;
 }
 
-.login.page .form .usernameInput, .passwordInput {
+.login.page .form .usernameInput,
+.passwordInput {
   background-color: transparent;
   border: none;
   border-bottom: 2px solid #fff;
@@ -73,13 +78,16 @@ ul {
   font-size: 200%;
 }
 
-.login.page .usernameInput, .passwordInput {
+.login.page .usernameInput,
+.passwordInput {
   font-size: 200%;
   letter-spacing: 3px;
   margin-bottom: 10px;
 }
 
-.login.page .title, .login.page .usernameInput, .passwordInput {
+.login.page .title,
+.login.page .usernameInput,
+.passwordInput {
   color: #fff;
   font-weight: 100;
 }
@@ -88,12 +96,14 @@ ul {
   width: 420px;
 }
 
-.login.page .twobutton .loginButton, .registerButton {
+.login.page .twobutton .loginButton,
+.registerButton {
   width: 200px;
   font-size: 20px;
   letter-spacing: 1px;
   font-weight: 200;
 }
+
 
 /* Chat page */
 
@@ -109,6 +119,7 @@ ul {
   flex-flow: row wrap;
   overflow: hidden;
 }
+
 
 /* Left side */
 
@@ -127,10 +138,11 @@ ul {
 
 .chatArea {
   background: #f7f7f7;
-  height: 100%;
-  overflow-y: auto;
+  height: 80%;
   border-bottom: 33px;
+  overflow-y: scroll;
 }
+
 
 /* Messages and Input */
 
@@ -145,9 +157,11 @@ ul {
 }
 
 .messages {
-  list-style-type: none;
+  height: 100%;
   margin: 0;
   padding: 0;
+  overflow-y: scroll;
+  padding: 10px 20px 10px 20px;
 }
 
 .messages li {
@@ -158,10 +172,6 @@ ul {
 
 .messages .right {
   text-align: right;
-}
-
-.messages .left {
-  text-align: left;
 }
 
 .messages .time {
@@ -177,6 +187,18 @@ ul {
   text-align: center;
 }
 
+.message.typing .messageBody {
+  color: gray;
+}
+
+.username {
+  font-weight: 700;
+  overflow: hidden;
+  padding-right: 15px;
+  text-align: right;
+}
+
+
 /* Aside part */
 
 .chat.page aside {
@@ -186,4 +208,59 @@ ul {
 
 .members {
   text-align: center;
+}
+
+
+/* Tooltip */
+
+.ui-tooltip,
+.arrow:after {
+  background: black;
+  border: 2px solid white;
+}
+
+.ui-tooltip {
+  padding: 10px 20px;
+  color: white;
+  border-radius: 20px;
+  font: bold 14px "Helvetica Neue", Sans-Serif;
+  text-transform: uppercase;
+  box-shadow: 0 0 7px black;
+}
+
+.arrow {
+  width: 70px;
+  height: 16px;
+  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  margin-left: -35px;
+  bottom: -16px;
+}
+
+.arrow.top {
+  top: -1px;
+  bottom: auto;
+}
+
+.arrow.left {
+  left: 50%;
+}
+
+.arrow:after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: -20px;
+  width: 25px;
+  height: 25px;
+  box-shadow: 6px 5px 9px -9px black;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.arrow.top:after {
+  bottom: -20px;
+  top: auto;
 }

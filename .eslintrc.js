@@ -7,6 +7,10 @@ module.exports = {
     "node": true,
     "jquery": true
   },
+  "rules": {
+    "no-bitwise": "off",
+    "no-param-reassign": "off"
+  },
   "plugins": [
       "react",
       "jsx-a11y",
