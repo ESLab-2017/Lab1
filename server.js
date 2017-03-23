@@ -4,6 +4,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const ip = require('ip');
+
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
@@ -61,6 +62,7 @@ function findDocuments(db, wtfind, callback) {
 io.on('connection', (socket) => {
   let addedUser = false;
   clients.push(socket);
+  console.log('connected');
 
   socket.on('start', () => {
     socket.emit('nick', `guest${incr}`);
