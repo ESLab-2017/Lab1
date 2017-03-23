@@ -9,7 +9,8 @@ module.exports = {
   },
   "rules": {
     "no-bitwise": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "no-undef": "off"
   },
   "plugins": [
       "react",
