@@ -110,7 +110,7 @@ io.on('connection', (socket) => {
       findDocuments(db, { username: user.username }, (doc) => {
         if (!doc[0]) {
           insertDocuments(db, { username: user.username, password: user.password }, () => {});
-          socket.emit('login entry', true);
+          socket.emit('register entry', true);
           addedUser = true;
           socket.username = user.username;
           io.emit('info', `New user: ${user.username}`);
@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
             numUsers: clients.length,
           });
         } else {
-          socket.emit('login entry', false);
+          socket.emit('register entry', false);
         }
         db.close();
       });
@@ -145,7 +145,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     if (addedUser) {
       io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
-      clients.splice(clients.indexOf(socket), 1); // clientIndex, 1);
+      clients.splice(clients.indexOf(socket), 1);
       io.emit('users list', getUsersList());
     }
   });

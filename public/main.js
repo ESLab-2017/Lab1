@@ -1,5 +1,6 @@
 $(() => {
   const FADE_TIME = 150;
+  const TYPING_TIMER_LENGTH = 500;
 
   const $objDiv = $('#msg_sec');
   const $window = $(window);
@@ -13,11 +14,12 @@ $(() => {
   const $registerBtn = $('.registerButton');
 
   const $mesInput = $('.inputMessage');
-  const $messages = $('#messages');
+  const $messages = $('.messages');
 
   const userCred = { username: '', password: '' };
   let typing = false;
   let connected = false;
+  let lastTypingTime;
   let curInput = $uneInput.focus();
 
   const socket = io();
@@ -52,7 +54,7 @@ $(() => {
     return result;
   }
 
-  function addMessageElement (el, options) {
+  function addMessageElement(el, options) {
     const $el = $(el);
 
     // Setup default options
@@ -83,19 +85,6 @@ $(() => {
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
       socket.emit('login', userCred);
-      socket.on('login entry', (suc) => {
-        if (suc) {
-          connected = true;
-          $loginPage.fadeOut();
-          $chatPage.show();
-          $loginPage.off('click');
-          curInput = $mesInput.focus();
-        } else {
-          alert('Incorrect username or password!');
-          userCred.username = '';
-          userCred.password = '';
-        }
-      });
     }
   }
 
@@ -104,20 +93,12 @@ $(() => {
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
       socket.emit('register', userCred);
-      socket.on('login entry', (suc) => {
-        if (suc) {
-          connected = true;
-          $loginPage.fadeOut();
-          $chatPage.show();
-          $loginPage.off('click');
-          curInput = $mesInput.focus();
-        } else {
-          alert('Username is taken!');
-          userCred.username = '';
-          userCred.password = '';
-        }
-      });
     }
+  }
+
+  function log(message, options) {
+    const $el = $('<li>').addClass('log').text(message);
+    addMessageElement($el, options);
   }
 
   function sendMessage() {
@@ -141,6 +122,25 @@ $(() => {
         item.innerHTML = u[i];
       }
       list.appendChild(item);
+    }
+  }
+
+  function updateTyping() {
+    if (connected) {
+      if (!typing) {
+        typing = true;
+        socket.emit('typing');
+      }
+      lastTypingTime = (new Date()).getTime();
+
+      setTimeout(() => {
+        const typingTimer = (new Date()).getTime();
+        const timeDiff = typingTimer - lastTypingTime;
+        if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
+          socket.emit('not typing');
+          typing = false;
+        }
+      }, TYPING_TIMER_LENGTH);
     }
   }
 
@@ -168,36 +168,54 @@ $(() => {
   });
 
   $mesInput.on('input', () => {
-    if ($('#boxMessage').val() !== '' && typing === false) {
-      socket.emit('typing');
-      typing = true;
-    } else if ($('#boxMessage').val() === '') {
-      socket.emit('not typing');
-      typing = false;
+    updateTyping();
+  });
+
+  $mesInput.click(() => {
+    $mesInput.focus();
+  });
+
+  socket.on('login entry', (suc) => {
+    if (suc) {
+      connected = true;
+      $loginPage.fadeOut();
+      $chatPage.show();
+      $loginPage.off('click');
+      curInput = $mesInput.focus();
+    } else {
+      alert('Incorrect username or password!');
+      userCred.username = '';
+      userCred.password = '';
     }
   });
 
-  // socket.on('connect', () => {
-  //   socket.emit('start');
-  // });
-
-  // socket.on('nick', (nick) => {
-  //   userCred.username = nick;
-  // });
+  socket.on('register entry', (suc) => {
+    if (suc) {
+      connected = true;
+      $loginPage.fadeOut();
+      $chatPage.show();
+      $loginPage.off('click');
+      curInput = $mesInput.focus();
+    } else {
+      alert('Username is taken!');
+      userCred.username = '';
+      userCred.password = '';
+    }
+  });
 
   socket.on('chat message', (msg) => {
     if (msg[1] === userCred.username) {
-      $('#messages').append(`<li><p align='right'>${msg[2]}</p></br></li>`);
-      $('#messages').append(`<li><p class='time' align='right'>${msg[0]}</p></li>`);
+      $messages.append(`<li><p class='right'>${msg[2]}</p></br></li>`);
+      $messages.append(`<li><p class='time right'>${msg[0]}</p></li>`);
     } else {
-      $('#messages').append(`<li><b><p align='left'>${msg[1]}:</b> ${msg[2]}</p></li>`);
-      $('#messages').append(`<li><p class='time' align='left'>${msg[0]}</p></li>`);
+      $messages.append(`<li><b><p class='left'>${msg[1]}:</b> ${msg[2]}</p></li>`);
+      $messages.append(`<li><p class='time left'>${msg[0]}</p></li>`);
     }
     $objDiv.scrollTop = $objDiv.scrollHeight;
   });
 
   socket.on('info', (inf) => {
-    $('#messages').append(`<li class='inf'><i>${inf}</i></li>`);
+    log(inf);
   });
 
   socket.on('users list', (usersList) => {
