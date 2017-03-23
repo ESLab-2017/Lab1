@@ -214,8 +214,6 @@ ul {
 .members {
   text-align: center;
 }
-<<<<<<< HEAD
-=======
 
 .arrow.top {
     top: -1px;
@@ -243,9 +241,3 @@ ul {
     bottom: -20px;
     top: auto;
 }
-
-#spin {
-    width: 30px;
-    height: 30px;
-}
->>>>>>> 0fd4551013597c3be0d0189c65b47323e2f10a23
