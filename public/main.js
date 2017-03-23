@@ -27,11 +27,6 @@ $(() => {
   let curInput = $uneInput.focus();
 
   const socket = io();
-  $(document).ready(() => {
-    $('.tooltip').tooltipster({
-      theme: 'tooltipster-borderless',
-    });
-  });
 
   function cleanInput(input) {
     return $('<div/>').text(input).text();
@@ -61,6 +56,11 @@ $(() => {
     }
     const result = `${days[day]} ${months[month]} ${d} ${year} ${h}:${m}:${s}`;
     return result;
+  }
+
+  function addSpinningIcon() {
+    $loginBtn[0].outerHTML = '';
+    $registerBtn[0].outerHTML = '<img src="https://i.stack.imgur.com/oQ0tF.gif" class="spin" />';
   }
 
   function getTypingMessages(data) {
@@ -104,12 +104,19 @@ $(() => {
       $messages.append($el);
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
+    $('.tooltip').tooltipster({
+      animation: 'grow',
+      delay: 150,
+      distance: 4,
+      theme: 'tooltipster-borderless',
+    });
   }
 
   function login() {
     userCred.username = cleanInput($uneInput.val().trim());
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
+      addSpinningIcon();
       socket.emit('login', userCred);
     }
   }
@@ -118,6 +125,7 @@ $(() => {
     userCred.username = cleanInput($uneInput.val().trim());
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
+      addSpinningIcon();
       socket.emit('register', userCred);
     }
   }
@@ -224,15 +232,11 @@ $(() => {
     });
   }
 
-  $loginBtn.click(() => {
-    $loginBtn[0].outerHTML = '';
-    $registerBtn[0].outerHTML = '<img src="https://i.stack.imgur.com/oQ0tF.gif" class="spin" />';
+  $loginBtn.click(() => {  
     login();
   });
 
   $registerBtn.click(() => {
-    $loginBtn[0].outerHTML = '';
-    $registerBtn[0].outerHTML = '<img src="https://i.stack.imgur.com/oQ0tF.gif" class="spin" />';
     register();
   });
 

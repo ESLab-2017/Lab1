@@ -80,9 +80,9 @@ ul {
 
 .login.page .usernameInput,
 .passwordInput {
-  font-size: 200%;
+  font-size: 150%;
   letter-spacing: 3px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .login.page .title,
@@ -98,17 +98,17 @@ ul {
 
 .login.page .twobutton .loginButton,
 .registerButton {
+  height: 50px;
   width: 200px;
   font-size: 20px;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   font-weight: 200;
 }
 
 .spin {
-    width: 20px;
-    height: 20px;
+    height: 50px;
+    width: 50px;
 }
-
 
 /* Chat page */
 
