@@ -64,12 +64,12 @@ io.on('connection', (socket) => {
   clients.push(socket);
   console.log('connected');
 
-  socket.on('start', () => {
-    socket.emit('nick', `guest${incr}`);
-    clients[clients.indexOf(socket)].n = `guest${incr}`;
-    incr += 1;
-    io.emit('users list', getUsersList());
-  });
+  // socket.on('start', () => {
+  //   socket.emit('nick', `guest${incr}`);
+  //   clients[clients.indexOf(socket)].n = `guest${incr}`;
+  //   incr += 1;
+  //   io.emit('users list', getUsersList());
+  // });
 
   socket.on('send chat message', (msg) => {
     io.emit('chat message', msg);
