@@ -16,7 +16,7 @@ http.listen(8080, () => {
   console.log(`listening on localhost:8080 and ${ip.address()}:8080`);
 });
 
-app.use(express.static(`${__dirname}/client`));
+app.use(express.static(`${__dirname}/public`));
 
 function getUsersList() {
   const usersList = [];
