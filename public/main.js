@@ -192,14 +192,25 @@ $(() => {
         const list = document.getElementById('ulist');
         list.innerHTML = '';
 
+        for (let i = 0; i < u.length - 1; i += 1) {
+            for (let j = i + 1; j < u.length; j += 1) {
+                if (u[i] === u[j]) {
+                    u[j] = "";
+                }
+            }
+        } //handle users with same name (written very badly)
+        
         for (let i = 0; i < u.length; i += 1) {
             const item = document.createElement('li');
+            if (u[i] === "") continue;
             if (u[i] === userCred.username) {
                 item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
-            } else {
-                item.innerHTML = u[i];
+                list.appendChild(item);
             }
-            list.appendChild(item);
+            else {
+                item.innerHTML = u[i];
+                list.appendChild(item);
+            }            
         }
     }
 
@@ -271,12 +282,6 @@ $(() => {
 
     $registerBtn.click(() => {
         register(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
-    });
-
-    $logoutBtn.click(() => {
-        console.log("logout button clicked");
-        document.cookie = "loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        location.reload();
     });
 
     $window.keydown((ev) => {

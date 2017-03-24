@@ -213,9 +213,9 @@ ul {
 }
 
 #logoutButton {
-    width: 100%;
-    background: #639ff2;
-    border: none;
-    padding: 10px;
-    color: #fff;
+    position: fixed;
+    bottom: 20px;
+    right: 20px; 
+    height: 40px;
+    width: 40px;
 }

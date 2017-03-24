@@ -26,7 +26,7 @@
                 <aside>
                     <h2 class="members">Members</h2>
                     <ul id="ulist"></ul>
-                    <button type="submit" class="logoutButton" id="logoutButton">Logout</button>
+                    <img src="img/logout.png" id="logoutButton" onclick="logout()">
                 </aside>
             </div>
         </li>
@@ -46,6 +46,13 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script type="text/javascript" src="tooltipster/dist/js/tooltipster.bundle.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
+    <script>
+        function logout() {
+            console.log("logout button clicked");
+            document.cookie = "loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            location.reload();
+        }
+    </script>
 </body>
 
 </html>

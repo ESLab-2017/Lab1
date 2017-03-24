@@ -22,10 +22,12 @@ app.use(express.static(`${__dirname}/public`));
 
 function getUsersList() {
     const usersList = [];
+    console.log("\n========== Current Users List ==========");
     for (let i = 0; i < clients.length; i += 1) {
         usersList[i] = clients[i].n;
-        //console.log("list: " + clients[i].n);
+        console.log(clients[i].n);
     }
+    console.log("====== End of Current Users List =======\n");
     return usersList;
 }
 
@@ -62,7 +64,6 @@ function findDocuments(db, wtfind, callback) {
 
 io.on('connection', (socket) => {
     let addedUser = false;
-    clients.push(socket);
 
     socket.on('send chat message', (msg) => {
         socket.broadcast.emit('chat message', msg);
@@ -72,7 +73,7 @@ io.on('connection', (socket) => {
         if (addedUser) return;
         MongoClient.connect(url, (err, db) => {
             assert.equal(null, err);
-            console.log(user.username + ' connected correctly to server');
+            console.log('User ' + user.username + ' connected correctly to server');
             findDocuments(db, { username: user.username }, (doc) => {
                 if (!doc[0] || doc[0].password !== user.password) {
                     socket.emit('login entry', false);
@@ -81,6 +82,7 @@ io.on('connection', (socket) => {
                     addedUser = true;
                     socket.username = user.username;
                     io.emit('info', `New user: ${user.username}`);
+                    clients.push(socket);
                     clients[clients.indexOf(socket)].n = user.username;
                     io.emit('update userlist', getUsersList());
                     io.emit('user joined', {
@@ -106,6 +108,7 @@ io.on('connection', (socket) => {
                     addedUser = true;
                     socket.username = user.username;
                     io.emit('info', `New user: ${user.username}`);
+                    clients.push(socket);
                     clients[clients.indexOf(socket)].n = user.username;
                     io.emit('update userlist', getUsersList());
                     io.emit('user joined', {
