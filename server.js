@@ -76,6 +76,8 @@ io.on('connection', (socket) => {
         if (!doc[0] || doc[0].password !== user.password) {
           socket.emit('login entry', false);
         } else {
+          socket.join(user.username);
+
           socket.emit('login entry', true);
           addedUser = true;
           socket.username = user.username;
@@ -101,6 +103,9 @@ io.on('connection', (socket) => {
       findDocuments(db, { username: user.username }, (doc) => {
         if (!doc[0]) {
           insertDocuments(db, { username: user.username, password: user.password }, () => {});
+
+          socket.join(user.username);
+
           socket.emit('register entry', true);
           addedUser = true;
           socket.username = user.username;
