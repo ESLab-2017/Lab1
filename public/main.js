@@ -58,9 +58,12 @@ $(() => {
     return result;
   }
 
-  function addSpinningIcon() {
-    $loginBtn[0].outerHTML = '';
-    $registerBtn[0].outerHTML = '<img src="https://i.stack.imgur.com/oQ0tF.gif" class="spin" />';
+  function addSpinningIcon(ev) {
+    if (ev === 'login') {
+      $loginBtn.html('<img src="img/loading.gif" class="spin" />');
+    } else {
+      $registerBtn.html('<img src="img/loading.gif" class="spin" />');
+    }
   }
 
   function getTypingMessages(data) {
@@ -116,8 +119,8 @@ $(() => {
     userCred.username = cleanInput($uneInput.val().trim());
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
-      addSpinningIcon();
-      socket.emit('login', userCred);
+      addSpinningIcon('login');
+      // socket.emit('login', userCred);
     }
   }
 
@@ -125,7 +128,7 @@ $(() => {
     userCred.username = cleanInput($uneInput.val().trim());
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
-      addSpinningIcon();
+      addSpinningIcon('register');
       socket.emit('register', userCred);
     }
   }
@@ -232,7 +235,7 @@ $(() => {
     });
   }
 
-  $loginBtn.click(() => {  
+  $loginBtn.click(() => {
     login();
   });
 
@@ -301,12 +304,8 @@ $(() => {
     log(inf);
   });
 
-  socket.on('user left', (data) => {
-    log(`${data.username} left'`);
-  });
-
-  socket.on('users list', (usersList) => {
-    updateUserList(usersList);
+  socket.on('update userlist', (list) => {
+    updateUserList(list);
   });
 
   socket.on('typing signal', (usersList) => {

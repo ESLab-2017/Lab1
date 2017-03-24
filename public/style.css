@@ -92,10 +92,6 @@ ul {
   font-weight: 100;
 }
 
-.login.page .twobutton {
-  width: 420px;
-}
-
 .login.page .twobutton .loginButton,
 .registerButton {
   height: 50px;
@@ -106,8 +102,8 @@ ul {
 }
 
 .spin {
-    height: 50px;
-    width: 50px;
+  height: 20px;
+  width: 20px;
 }
 
 /* Chat page */

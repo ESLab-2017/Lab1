@@ -79,7 +79,7 @@ io.on('connection', (socket) => {
           socket.username = user.username;
           io.emit('info', `New user: ${user.username}`);
           clients[clients.indexOf(socket)].n = user.username;
-          io.emit('users list', getUsersList());
+          io.emit('update userlist', getUsersList());
           io.emit('user joined', {
             username: socket.username,
             numUsers: clients.length,
@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
           socket.username = user.username;
           io.emit('info', `New user: ${user.username}`);
           clients[clients.indexOf(socket)].n = user.username;
-          io.emit('users list', getUsersList());
+          io.emit('update userlist', getUsersList());
           io.emit('user joined', {
             username: socket.username,
             numUsers: clients.length,
@@ -135,11 +135,7 @@ io.on('connection', (socket) => {
     if (addedUser) {
       io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
       clients.splice(clients.indexOf(socket), 1);
-      io.emit('users list', getUsersList());
-      socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: clients.length,
-      });
+      socket.broadcast.emit('update userlist', getUsersList());
     }
   });
 });
