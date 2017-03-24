@@ -13,6 +13,7 @@ const assert = require('assert');
 const url = 'mongodb://test:test@ds060009.mlab.com:60009/eslab1_chat_room';
 
 const clients = [];
+var curMsgIdx = 0;
 
 http.listen(port, () => {
     console.log(`listening on localhost:8080 and ${ip.address()}:8080`);
@@ -52,6 +53,18 @@ function insertDocuments(db, wtinsert, callback) {
     });
 }
 
+function addMesage(db, wtinsert, callback) {
+    // Get the documents collection
+    const messages = db.collection('messages');
+    // Insert some documents
+    messages.insert([wtinsert], (err, result) => {
+        assert.equal(err, null);
+        assert.equal(1, result.result.n);
+        assert.equal(1, result.ops.length);
+        callback(result);
+    });
+}
+
 function findDocuments(db, wtfind, callback) {
     // Get the documents collection
     const userProfile = db.collection('userProfile');
@@ -65,8 +78,41 @@ function findDocuments(db, wtfind, callback) {
 io.on('connection', (socket) => {
     let addedUser = false;
 
+    socket.on('download message', () => {
+        console.log('message downloaded');
+        MongoClient.connect(url, (err, db) => {
+            const messages = db.collection('messages');
+            var cursor = messages.find({});
+            cursor.forEach( function(myDoc) { 
+                const tmp = {
+                    username: myDoc.username,
+                    message: myDoc.message,
+                    time: myDoc.time
+                };
+                socket.emit('chat message', (tmp));
+             } );
+            //db.users.find().forEach( function(myDoc) { print( "user: " + myDoc.name ); } );
+
+            //console.log('Message added to server');
+            //db.dropDatabase();
+            db.close();
+        });
+        //socket.emit('chat message', msg);        
+    });
+    
     socket.on('send chat message', (msg) => {
         socket.broadcast.emit('chat message', msg);
+        MongoClient.connect(url, (err, db) => {
+            assert.equal(null, err);
+            addMesage(db, { msgIdx: curMsgIdx,
+                            username: msg.username,
+                            message: msg.message,
+                            time: msg.time          }, () => {});
+            curMsgIdx++;
+            console.log('Message added to server');
+            //db.dropDatabase();
+            db.close();
+        });
     });
 
     socket.on('login', (user) => {

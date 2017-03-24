@@ -307,6 +307,7 @@ $(() => {
         $mesInput.focus();
     });
 
+    //TODO: user is already logged on
     socket.on('login entry', (suc) => {
         if (suc) {
             connected = true;
@@ -317,6 +318,7 @@ $(() => {
             document.cookie = "loggedIn" + "=" + 1 + ";path=/";
             document.cookie = "userName" + "=" + userCred.username + ";path=/";
             document.cookie = "userPass" + "=" + userCred.password + ";path=/";
+            socket.emit('download message');
         } else {
             alert('Incorrect username or password!');
             userCred.username = '';
@@ -335,6 +337,7 @@ $(() => {
             document.cookie = "loggedIn" + "=" + 1 + ";path=/";
             document.cookie = "userName" + "=" + userCred.username + ";path=/";
             document.cookie = "userPass" + "=" + userCred.password + ";path=/";
+            socket.emit('download message');
         } else {
             alert('Username is taken!');
             userCred.username = '';
