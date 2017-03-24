@@ -120,7 +120,7 @@ $(() => {
     userCred.password = cleanInput($pwdInput.val().trim());
     if (userCred.username && userCred.password) {
       addSpinningIcon('login');
-      // socket.emit('login', userCred);
+      socket.emit('login', userCred);
     }
   }
 
