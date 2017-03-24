@@ -2,57 +2,51 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>ESLab1 Chat Room</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu" />
-    <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/tooltipster.bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-borderless.min.css" />
-    <link rel="stylesheet" type="text/css" href="style.css" />
+  <meta charset="UTF-8">
+  <title>ESLab1 Chat Room</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu" />
+  <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/tooltipster.bundle.min.css" />
+  <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-borderless.min.css"
+  />
+  <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
-    <ul class="pages">
-        <li class="new page">
-            <div class="chat page">
-                <div class="leftside">
-                    <header>
-                        <h2>Messages</h2>
-                    </header>
-                    <div class="chatArea">
-                        <ul class="messages"></ul>
-                    </div>
-                    <input class="inputMessage" type="text" autocomplete="off" placeholder="Say something" />
-                </div>
-                <aside>
-                    <h2 class="members">Members</h2>
-                    <ul id="ulist"></ul>
-                    <img src="img/logout.png" id="logoutButton" onclick="logout()">
-                </aside>
-            </div>
-        </li>
-        <li class="login page">
-            <div class="form">
-                <h3 class="title">Welcome</h3>
-                <input class="usernameInput" type="text" placeholder="USERNAME" maxlength="14" />
-                <input class="passwordInput" type="password" placeholder="PASSWORD" maxlength="14" />
-                <div class="twobutton">
-                    <button type="submit" class="loginButton" id="loginButton">Login</button>
-                    <button type="submit" class="registerButton" id="registerButton">Register</button>
-                </div>
-            </div>
-        </li>
-    </ul>
-    <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script type="text/javascript" src="tooltipster/dist/js/tooltipster.bundle.min.js"></script>
-    <script type="text/javascript" src="main.js"></script>
-    <script>
-        function logout() {
-            console.log("logout button clicked");
-            document.cookie = "loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            location.reload();
-        }
-    </script>
+  <ul class="pages">
+    <li class="new page">
+      <div class="chat page">
+        <div class="leftside">
+          <header>
+            <h2>Messages</h2>
+          </header>
+          <div class="chatArea">
+            <ul class="messages"></ul>
+          </div>
+          <input class="inputMessage" type="text" autocomplete="off" placeholder="Say something" />
+        </div>
+        <aside>
+          <h2 class="members">Members</h2>
+          <ul id="ulist"></ul>
+          <img src="img/logout.png" class="logoutButton">
+        </aside>
+      </div>
+    </li>
+    <li class="login page">
+      <div class="form">
+        <h3 class="title">Welcome</h3>
+        <input class="usernameInput" type="text" placeholder="USERNAME" maxlength="14" />
+        <input class="passwordInput" type="password" placeholder="PASSWORD" maxlength="14" />
+        <div class="twobutton">
+          <button type="submit" class="loginButton" id="loginButton">Login</button>
+          <button type="submit" class="registerButton" id="registerButton">Register</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script type="text/javascript" src="tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+  <script type="text/javascript" src="main.js"></script>
 </body>
 
 </html>
