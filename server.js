@@ -5,6 +5,8 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const ip = require('ip');
 
+const port = process.env.PORT || 8080;
+
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
@@ -12,7 +14,7 @@ const url = 'mongodb://test:test@ds060009.mlab.com:60009/eslab1_chat_room';
 
 const clients = [];
 
-http.listen(8080, () => {
+http.listen(port, () => {
   console.log(`listening on localhost:8080 and ${ip.address()}:8080`);
 });
 
