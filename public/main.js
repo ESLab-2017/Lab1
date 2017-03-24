@@ -16,6 +16,7 @@ $(() => {
     const $pwdInput = $('.passwordInput');
     const $loginBtn = $('.loginButton');
     const $registerBtn = $('.registerButton');
+    const $logoutBtn = $('.logoutButton');
 
     const $mesInput = $('.inputMessage');
     const $messages = $('.messages');
@@ -115,18 +116,18 @@ $(() => {
         });
     }
 
-    function login() {
-        userCred.username = cleanInput($uneInput.val().trim());
-        userCred.password = cleanInput($pwdInput.val().trim());
+    function login(une, pwd) {
+        userCred.username = une;
+        userCred.password = pwd;
         if (userCred.username && userCred.password) {
             addSpinningIcon('login');
             socket.emit('login', userCred);
         }
     }
 
-    function register() {
-        userCred.username = cleanInput($uneInput.val().trim());
-        userCred.password = cleanInput($pwdInput.val().trim());
+    function register(une, pwd) {
+        userCred.username = une;
+        userCred.password = pwd;
         if (userCred.username && userCred.password) {
             addSpinningIcon('register');
             socket.emit('register', userCred);
@@ -258,16 +259,24 @@ $(() => {
         $chatPage.show();
         $loginPage.off('click');
         curInput = $mesInput.focus();
-        userCred.username = getCookie("userName");
+        login(getCookie("userName"), getCookie("userPass"));
+        //userCred.username = getCookie("userName");
+        //userCred.password = getCookie("userPass");
         console.log('Logged in before, user is: ' + getCookie("userName"));
     }
 
     $loginBtn.click(() => {
-        login();
+        login(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
     });
 
     $registerBtn.click(() => {
-        register();
+        register(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
+    });
+
+    $logoutBtn.click(() => {
+        console.log("logout button clicked");
+        document.cookie = "loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        location.reload();
     });
 
     $window.keydown((ev) => {
@@ -302,6 +311,7 @@ $(() => {
             curInput = $mesInput.focus();
             document.cookie = "loggedIn" + "=" + 1 + ";path=/";
             document.cookie = "userName" + "=" + userCred.username + ";path=/";
+            document.cookie = "userPass" + "=" + userCred.password + ";path=/";
         } else {
             alert('Incorrect username or password!');
             userCred.username = '';
@@ -319,6 +329,7 @@ $(() => {
             curInput = $mesInput.focus();
             document.cookie = "loggedIn" + "=" + 1 + ";path=/";
             document.cookie = "userName" + "=" + userCred.username + ";path=/";
+            document.cookie = "userPass" + "=" + userCred.password + ";path=/";
         } else {
             alert('Username is taken!');
             userCred.username = '';
