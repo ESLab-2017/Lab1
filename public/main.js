@@ -357,9 +357,15 @@ $(() => {
       const tmp = newMesList.indexOf(userCred.room);
       if (tmp > -1) newMesList.splice(tmp, 1);
       socket.emit('update userlist');
-    } else userCred.room = val;
-    $messages.empty();
-    socket.emit('download message', userCred.room);
+      $messages.empty();
+      socket.emit('download message', userCred.room);
+    } 
+    else if (val == userCred.username) {}    
+    else {
+      userCred.room = val;
+      $messages.empty();
+      socket.emit('download message', userCred.room);
+    }
   });
 
   var loggedIn = getCookie('loggedIn');
