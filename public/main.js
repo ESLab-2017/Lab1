@@ -16,11 +16,15 @@ $(() => {
   const $pwdInput = $('.passwordInput');
   const $loginBtn = $('.loginButton');
   const $registerBtn = $('.registerButton');
+  const $logoutBtn = $('.logoutButton');
 
   const $mesInput = $('.inputMessage');
   const $messages = $('.messages');
 
-  const userCred = { username: '', password: '' };
+  const userCred = {
+    username: '',
+    password: '',
+  };
   let typing = false;
   let connected = false;
   let lastTypingTime;
@@ -115,18 +119,18 @@ $(() => {
     });
   }
 
-  function login() {
-    userCred.username = cleanInput($uneInput.val().trim());
-    userCred.password = cleanInput($pwdInput.val().trim());
+  function login(une, pwd) {
+    userCred.username = une;
+    userCred.password = pwd;
     if (userCred.username && userCred.password) {
       addSpinningIcon('login');
       socket.emit('login', userCred);
     }
   }
 
-  function register() {
-    userCred.username = cleanInput($uneInput.val().trim());
-    userCred.password = cleanInput($pwdInput.val().trim());
+  function register(une, pwd) {
+    userCred.username = une;
+    userCred.password = pwd;
     if (userCred.username && userCred.password) {
       addSpinningIcon('register');
       socket.emit('register', userCred);
@@ -149,9 +153,9 @@ $(() => {
 
     const typingClass = data.typing ? 'typing' : '';
     const $messageBodyDiv = $('<span class="messageBody">')
-        .text(data.message)
-        .addClass('tooltip')
-        .prop('title', data.time);
+      .text(data.message)
+      .addClass('tooltip')
+      .prop('title', data.time);
     let $messageDiv;
     if (data.username !== userCred.username) {
       const $usernameDiv = $('<span class="username"/>')
@@ -191,14 +195,23 @@ $(() => {
     const list = document.getElementById('ulist');
     list.innerHTML = '';
 
+    for (let i = 0; i < u.length - 1; i += 1) {
+      for (let j = i + 1; j < u.length; j += 1) {
+        if (u[i] === u[j]) {
+          u[j] = '';
+        }
+      }
+    } // handle users with same name (written very badly)
+
     for (let i = 0; i < u.length; i += 1) {
       const item = document.createElement('li');
       if (u[i] === userCred.username) {
         item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
-      } else {
+        list.appendChild(item);
+      } else if (u[i] !== '') {
         item.innerHTML = u[i];
+        list.appendChild(item);
       }
-      list.appendChild(item);
     }
   }
 
@@ -235,12 +248,47 @@ $(() => {
     });
   }
 
+  function getCookie(cname) {
+    const name = `${cname}=`;
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i += 1) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return '';
+  }
+
+  function logout() {
+    console.log('logout button clicked');
+    document.cookie = 'loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    location.reload();
+  }
+
+  // When page is reloaded, check cookie if logged in before
+  if (getCookie('loggedIn')) {
+    connected = true;
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    curInput = $mesInput.focus();
+    login(getCookie('userName'), getCookie('userPass'));
+    // userCred.username = getCookie("userName");
+    // userCred.password = getCookie("userPass");
+    console.log(`Logged in before, user is: ${getCookie('userName')}`);
+  }
+
   $loginBtn.click(() => {
-    login();
+    login(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
   });
 
   $registerBtn.click(() => {
-    register();
+    register(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
   });
 
   $window.keydown((ev) => {
@@ -266,6 +314,11 @@ $(() => {
     $mesInput.focus();
   });
 
+  $logoutBtn.click(() => {
+    logout();
+  });
+
+  // TODO: user is already logged on
   socket.on('login entry', (suc) => {
     if (suc) {
       connected = true;
@@ -273,6 +326,10 @@ $(() => {
       $chatPage.show();
       $loginPage.off('click');
       curInput = $mesInput.focus();
+      document.cookie = `loggedIn=${1};path=/`;
+      document.cookie = `userName=${userCred.username};path=/`;
+      document.cookie = `userPass=${userCred.password};path=/`;
+      socket.emit('download message');
     } else {
       alert('Incorrect username or password!');
       userCred.username = '';
@@ -288,6 +345,10 @@ $(() => {
       $chatPage.show();
       $loginPage.off('click');
       curInput = $mesInput.focus();
+      document.cookie = `loggedIn=${1};path=/`;
+      document.cookie = `userName=${userCred.username};path=/`;
+      document.cookie = `userPass=${userCred.password};path=/`;
+      socket.emit('download message');
     } else {
       alert('Username is taken!');
       userCred.username = '';

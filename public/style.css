@@ -106,6 +106,7 @@ ul {
   width: 20px;
 }
 
+
 /* Chat page */
 
 .new.page {
@@ -209,4 +210,12 @@ ul {
 
 .members {
   text-align: center;
+}
+
+.logoutButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 40px;
+  width: 40px;
 }
