@@ -362,8 +362,9 @@ $(() => {
     socket.emit('download message', userCred.room);
   });
 
+  var loggedIn = getCookie('loggedIn');
   // When page is reloaded, check cookie if logged in before
-  if (getCookie('loggedIn')) {
+  if (loggedIn) {
     connected = true;
     $loginPage.fadeOut();
     $chatPage.show();
@@ -371,6 +372,10 @@ $(() => {
     curInput = $mesInput.focus();
     login(getCookie('userName'), getCookie('userPass'));
     console.log(`Logged in before, user is: ${getCookie('userName')}`);
+  }
+  else {
+    $loginPage.show();
+    curInput = $uneInput.focus();
   }
 
   // TODO: user is already logged on
