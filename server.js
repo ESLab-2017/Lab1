@@ -32,15 +32,6 @@ function getUsersList() {
   return usersList;
 }
 
-function setUserTyping(index) {
-  const usersList = [];
-  for (let i = 0; i < clients.length; i += 1) {
-    usersList[i] = clients[i].n;
-  }
-  usersList[index] = `💬 ${clients[index].n}`;
-  return usersList;
-}
-
 function insertDocuments(db, wtinsert, callback) {
   // Get the documents collection
   const userProfile = db.collection('userProfile');
@@ -78,41 +69,56 @@ function findDocuments(db, wtfind, callback) {
 io.on('connection', (socket) => {
   let addedUser = false;
 
-  socket.on('download message', () => {
+  socket.on('download message', (room) => {
     console.log('message downloaded');
+    socket.room = room;
     MongoClient.connect(url, (err, db) => {
       const messages = db.collection('messages');
-      const cursor = messages.find({});
+      let cursor;
+      if (room) {
+        cursor = messages.find({ $or: [{
+          username: socket.username,
+          room,
+        }, {
+          username: room,
+          room: socket.username,
+        }] });
+      } else cursor = messages.find({ room: '' });
       cursor.forEach((myDoc) => {
         const tmp = {
           username: myDoc.username,
           message: myDoc.message,
           time: myDoc.time,
+          room: myDoc.room,
         };
         socket.emit('chat message', (tmp));
       });
-      // db.users.find().forEach( function(myDoc) { print( "user: " + myDoc.name ); } );
-
-      // console.log('Message added to server');
-      // db.dropDatabase();
+      socket.emit('welcome', room);
       db.close();
     });
-    // socket.emit('chat message', msg);
   });
 
-  socket.on('send chat message', (msg) => {
-    socket.broadcast.emit('chat message', msg);
+  socket.on('send chat message', (data) => {
+    if (data.room) {
+      io.sockets.to(data.room).emit('chat message', data);
+      io.sockets.to(data.room).emit('update userlist', {
+        list: getUsersList(),
+        username: data.username,
+      });
+    } else {
+      socket.broadcast.emit('chat message', data);
+    }
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
       addMesage(db, {
-        msgIdx: curMsgIdx,
-        username: msg.username,
-        message: msg.message,
-        time: msg.time,
+        dataIdx: curMsgIdx,
+        username: data.username,
+        message: data.message,
+        time: data.time,
+        room: data.room,
       }, () => {});
       curMsgIdx += 1;
       console.log('Message added to server');
-      // db.dropDatabase();
       db.close();
     });
   });
@@ -121,7 +127,7 @@ io.on('connection', (socket) => {
     if (addedUser) return;
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
-      console.log(`User ${user.username} connected correctly to server`);
+      console.log(`User ${user.username} connected corroomtly to server`);
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
@@ -133,13 +139,15 @@ io.on('connection', (socket) => {
           socket.emit('login entry', true);
           addedUser = true;
           socket.username = user.username;
-          io.emit('info', `New user: ${user.username}`);
           clients.push(socket);
-          clients[clients.indexOf(socket)].n = user.username;
-          io.emit('update userlist', getUsersList());
-          io.emit('user joined', {
+          clients[clients.indexOf(socket)].n = socket.username;
+          io.emit('update userlist', {
+            list: getUsersList(),
+          });
+          socket.broadcast.emit('user joined', {
             username: socket.username,
             numUsers: clients.length,
+            room: user.room,
           });
         }
         db.close();
@@ -152,34 +160,30 @@ io.on('connection', (socket) => {
 
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
-      console.log('Connected correctly to server');
+      console.log('Connected corroomtly to server');
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
         if (!doc[0]) {
-<<<<<<< HEAD
-          insertDocuments(db, { 
-            username: user.username, 
-            password: user.password, 
-          }, () => {});
-
-          socket.join(user.username);
-=======
           insertDocuments(db, {
             username: user.username,
             password: user.password,
           }, () => {});
->>>>>>> cookie-test
+
+          socket.join(user.username);
+
           socket.emit('register entry', true);
           addedUser = true;
           socket.username = user.username;
-          io.emit('info', `New user: ${user.username}`);
           clients.push(socket);
-          clients[clients.indexOf(socket)].n = user.username;
-          io.emit('update userlist', getUsersList());
-          io.emit('user joined', {
+          clients[clients.indexOf(socket)].n = socket.username;
+          io.emit('update userlist', {
+            list: getUsersList(),
+          });
+          socket.broadcast.emit('user joined', {
             username: socket.username,
             numUsers: clients.length,
+            room: user.room,
           });
         } else {
           socket.emit('register entry', false);
@@ -189,26 +193,38 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('typing', () => {
-    io.emit('typing signal', setUserTyping(clients.indexOf(socket)));
-    socket.broadcast.emit('typing', {
-      username: socket.username,
+  socket.on('update userlist', () => {
+    socket.emit('update userlist', {
+      list: getUsersList(),
     });
   });
 
-  socket.on('not typing', () => {
-    io.emit('typing signal', getUsersList());
+  socket.on('typing', (room) => {
+    socket.broadcast.emit('typing', {
+      username: socket.username,
+      room,
+    });
+  });
+
+  socket.on('not typing', (room) => {
     socket.broadcast.emit('stop typing', {
       username: socket.username,
+      room,
     });
   });
 
   socket.on('disconnect', () => {
     if (addedUser) {
-      io.emit('info', `User ${clients[clients.indexOf(socket)].n} disconnected.`);
+      socket.broadcast.emit('user left', {
+        username: socket.username,
+        numUsers: clients.length,
+        room: socket.room,
+      });
+      socket.broadcast.emit('update userlist', {
+        list: getUsersList(),
+      });
       console.log(`User ${clients[clients.indexOf(socket)].n} disconnected.`);
       clients.splice(clients.indexOf(socket), 1);
-      socket.broadcast.emit('update userlist', getUsersList());
     }
   });
 });

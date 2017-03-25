@@ -131,11 +131,14 @@ ul {
   width: calc(100% - 200px);
 }
 
-.chat.page header {
+.chat.page .header {
   background: #3b5998;
   color: #fff;
-  text-align: center;
   height: 10%;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
 }
 
 .chatArea {
@@ -198,6 +201,7 @@ ul {
   overflow: hidden;
   padding-right: 15px;
   text-align: right;
+  white-space: pre;
 }
 
 
@@ -209,6 +213,10 @@ ul {
 }
 
 .members {
+  text-align: center;
+}
+
+.all {
   text-align: center;
 }
 

@@ -21,13 +21,20 @@ $(() => {
   const $mesInput = $('.inputMessage');
   const $messages = $('.messages');
 
+  const $all = $('.all');
+  const $memList = $('.uList');
+  const $member = $('.member');
+
   const userCred = {
     username: '',
     password: '',
+    room: '',
   };
+  const newMesList = [];
   let typing = false;
   let connected = false;
   let lastTypingTime;
+  let lastUser;
   let curInput = $uneInput.focus();
 
   const socket = io();
@@ -111,6 +118,7 @@ $(() => {
       $messages.append($el);
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
+
     $('.tooltip').tooltipster({
       animation: 'grow',
       delay: 150,
@@ -137,6 +145,18 @@ $(() => {
     }
   }
 
+  function loadChatPage() {
+    connected = true;
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    curInput = $mesInput.focus();
+    document.cookie = `loggedIn=${1};path=/`;
+    document.cookie = `userName=${userCred.username};path=/`;
+    document.cookie = `userPass=${userCred.password};path=/`;
+    socket.emit('download message', userCred.room);
+  }
+
   function log(message, options) {
     const $el = $('<li>').addClass('log').text(message);
     addMessageElement($el, options);
@@ -145,6 +165,7 @@ $(() => {
   function addChatMessage(data, options) {
     // Don't fade the message in if there is an 'X was typing'
     const $typingMessages = getTypingMessages(data);
+
     options = options || {};
     if ($typingMessages.length !== 0) {
       options.fade = false;
@@ -157,10 +178,19 @@ $(() => {
       .addClass('tooltip')
       .prop('title', data.time);
     let $messageDiv;
-    if (data.username !== userCred.username) {
+    if (data.username !== userCred.username && (lastUser !== data.username || data.typing)) {
       const $usernameDiv = $('<span class="username"/>')
         .text(data.username)
         .css('color', getUsernameColor(data.username));
+
+      $messageDiv = $('<li class="message"/>')
+        .data('username', data.username)
+        .addClass(typingClass)
+        .append($usernameDiv, $messageBodyDiv);
+    } else if (data.username !== userCred.username) {
+      const $usernameDiv = $('<span class="username"/>')
+        .text(data.username)
+        .css('color', '#f7f7f7');
 
       $messageDiv = $('<li class="message"/>')
         .data('username', data.username)
@@ -173,7 +203,7 @@ $(() => {
         .addClass('right')
         .append($messageBodyDiv);
     }
-
+    if (!data.typing) lastUser = data.username;
     addMessageElement($messageDiv, options);
   }
 
@@ -183,6 +213,7 @@ $(() => {
       username: userCred.username,
       message: msg,
       time: dateTime(),
+      room: userCred.room,
     };
     if (msg && connected) {
       $mesInput.val('');
@@ -192,8 +223,7 @@ $(() => {
   }
 
   function updateUserList(u) {
-    const list = document.getElementById('ulist');
-    list.innerHTML = '';
+    $memList[0].innerHTML = '';
 
     for (let i = 0; i < u.length - 1; i += 1) {
       for (let j = i + 1; j < u.length; j += 1) {
@@ -206,11 +236,12 @@ $(() => {
     for (let i = 0; i < u.length; i += 1) {
       const item = document.createElement('li');
       if (u[i] === userCred.username) {
-        item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
-        list.appendChild(item);
+        item.innerHTML = `<span class="member"><b>${u[i]}</b> <i>(You)</i></span>`;
+        $memList[0].appendChild(item);
       } else if (u[i] !== '') {
-        item.innerHTML = u[i];
-        list.appendChild(item);
+        if (newMesList.find(el => el === u[i])) item.innerHTML = `<span class="member">💡 ${u[i]}</span>`;
+        else item.innerHTML = `<span class="member">${u[i]}</span>`;
+        $memList[0].appendChild(item);
       }
     }
   }
@@ -219,7 +250,7 @@ $(() => {
     if (connected) {
       if (!typing) {
         typing = true;
-        socket.emit('typing');
+        socket.emit('typing', userCred.room);
       }
       lastTypingTime = (new Date()).getTime();
 
@@ -227,7 +258,7 @@ $(() => {
         const typingTimer = (new Date()).getTime();
         const timeDiff = typingTimer - lastTypingTime;
         if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-          socket.emit('not typing');
+          socket.emit('not typing', userCred.room);
           typing = false;
         }
       }, TYPING_TIMER_LENGTH);
@@ -270,19 +301,6 @@ $(() => {
     location.reload();
   }
 
-  // When page is reloaded, check cookie if logged in before
-  if (getCookie('loggedIn')) {
-    connected = true;
-    $loginPage.fadeOut();
-    $chatPage.show();
-    $loginPage.off('click');
-    curInput = $mesInput.focus();
-    login(getCookie('userName'), getCookie('userPass'));
-    // userCred.username = getCookie("userName");
-    // userCred.password = getCookie("userPass");
-    console.log(`Logged in before, user is: ${getCookie('userName')}`);
-  }
-
   $loginBtn.click(() => {
     login(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
   });
@@ -300,7 +318,7 @@ $(() => {
     if (ev.which === 13) {
       if (userCred.username) {
         sendMessage();
-        socket.emit('not typing');
+        socket.emit('not typing', userCred.room);
         typing = false;
       }
     }
@@ -311,25 +329,54 @@ $(() => {
   });
 
   $mesInput.click(() => {
-    $mesInput.focus();
+    $mesInput.focus(() => {
+      if (newMesList.find(el => el === userCred.room)) {
+        const tmp = newMesList.indexOf(userCred.room);
+        if (tmp > -1) newMesList.splice(tmp, 1);
+        socket.emit('update userlist');
+      }
+    });
   });
 
   $logoutBtn.click(() => {
     logout();
   });
 
+  $all.click(() => {
+    if (userCred.room) {
+      userCred.room = '';
+      $messages.empty();
+      socket.emit('download message', userCred.room);
+    }
+  });
+
+  $memList.on('click', $member, (mem) => {
+    const val = mem.target.textContent;
+    if (val.search('💡') > -1) {
+      userCred.room = val.substr(val.search('💡') + 3);
+      const tmp = newMesList.indexOf(userCred.room);
+      if (tmp > -1) newMesList.splice(tmp, 1);
+      socket.emit('update userlist');
+    } else userCred.room = val;
+    $messages.empty();
+    socket.emit('download message', userCred.room);
+  });
+
+  // When page is reloaded, check cookie if logged in before
+  if (getCookie('loggedIn')) {
+    connected = true;
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    curInput = $mesInput.focus();
+    login(getCookie('userName'), getCookie('userPass'));
+    console.log(`Logged in before, user is: ${getCookie('userName')}`);
+  }
+
   // TODO: user is already logged on
   socket.on('login entry', (suc) => {
     if (suc) {
-      connected = true;
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      curInput = $mesInput.focus();
-      document.cookie = `loggedIn=${1};path=/`;
-      document.cookie = `userName=${userCred.username};path=/`;
-      document.cookie = `userPass=${userCred.password};path=/`;
-      socket.emit('download message');
+      loadChatPage();
     } else {
       alert('Incorrect username or password!');
       userCred.username = '';
@@ -340,15 +387,7 @@ $(() => {
 
   socket.on('register entry', (suc) => {
     if (suc) {
-      connected = true;
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      curInput = $mesInput.focus();
-      document.cookie = `loggedIn=${1};path=/`;
-      document.cookie = `userName=${userCred.username};path=/`;
-      document.cookie = `userPass=${userCred.password};path=/`;
-      socket.emit('download message');
+      loadChatPage();
     } else {
       alert('Username is taken!');
       userCred.username = '';
@@ -357,27 +396,40 @@ $(() => {
     }
   });
 
-  socket.on('chat message', (msg) => {
-    addChatMessage(msg);
+  socket.on('welcome', (rm) => {
+    if (rm) log(`Private message with ${rm}`);
+    else log('Welcome to All');
   });
 
-  socket.on('info', (inf) => {
-    log(inf);
+  socket.on('chat message', (data) => {
+    if ((!data.room && !userCred.room) ||
+        (data.room === userCred.username && userCred.room === data.username) ||
+        (data.username === userCred.username && userCred.room === data.room)) addChatMessage(data);
   });
 
-  socket.on('update userlist', (list) => {
-    updateUserList(list);
+  socket.on('user joined', (data) => {
+    if ((!data.room && !userCred.room) ||
+        (data.room === userCred.username && userCred.room === data.username))log(`${data.username} joined`);
   });
 
-  socket.on('typing signal', (usersList) => {
-    updateUserList(usersList);
+  socket.on('user left', (data) => {
+    if ((!data.room && !userCred.room) ||
+        (data.room === userCred.username && userCred.room === data.username)) log(`${data.username} left`);
+    removeChatTyping(data);
+  });
+
+  socket.on('update userlist', (data) => {
+    if (data.username) newMesList.push(data.username);
+    updateUserList(data.list);
   });
 
   socket.on('typing', (data) => {
-    addChatTyping(data);
+    if ((!data.room && !userCred.room) ||
+        (data.room === userCred.username && userCred.room === data.username)) addChatTyping(data);
   });
 
   socket.on('stop typing', (data) => {
-    removeChatTyping(data);
+    if ((!data.room && !userCred.room) ||
+        (data.room === userCred.username && userCred.room === data.username)) removeChatTyping(data);
   });
 });
