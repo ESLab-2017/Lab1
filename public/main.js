@@ -359,16 +359,14 @@ $(() => {
       socket.emit('update userlist');
       $messages.empty();
       socket.emit('download message', userCred.room);
-    } 
-    else if (val == userCred.username) {}    
-    else {
+    } else if (val !== userCred.username && val !== '(You)') {
       userCred.room = val;
       $messages.empty();
       socket.emit('download message', userCred.room);
     }
   });
 
-  var loggedIn = getCookie('loggedIn');
+  const loggedIn = getCookie('loggedIn');
   // When page is reloaded, check cookie if logged in before
   if (loggedIn) {
     connected = true;
@@ -378,8 +376,7 @@ $(() => {
     curInput = $mesInput.focus();
     login(getCookie('userName'), getCookie('userPass'));
     console.log(`Logged in before, user is: ${getCookie('userName')}`);
-  }
-  else {
+  } else {
     $loginPage.show();
     curInput = $uneInput.focus();
   }
@@ -414,18 +411,22 @@ $(() => {
 
   socket.on('chat message', (data) => {
     if ((!data.room && !userCred.room) ||
-        (data.room === userCred.username && userCred.room === data.username) ||
-        (data.username === userCred.username && userCred.room === data.room)) addChatMessage(data);
+        (data.room === userCred.username &&
+        userCred.room === data.username) ||
+        (data.username === userCred.username &&
+        userCred.room === data.room)) addChatMessage(data);
   });
 
   socket.on('user joined', (data) => {
     if ((!data.room && !userCred.room) ||
-        (data.room === userCred.username && userCred.room === data.username))log(`${data.username} joined`);
+        (data.room === userCred.username &&
+        userCred.room === data.username))log(`${data.username} joined`);
   });
 
   socket.on('user left', (data) => {
     if ((!data.room && !userCred.room) ||
-        (data.room === userCred.username && userCred.room === data.username)) log(`${data.username} left`);
+        (data.room === userCred.username &&
+        userCred.room === data.username)) log(`${data.username} left`);
     removeChatTyping(data);
   });
 
@@ -436,11 +437,13 @@ $(() => {
 
   socket.on('typing', (data) => {
     if ((!data.room && !userCred.room) ||
-        (data.room === userCred.username && userCred.room === data.username)) addChatTyping(data);
+        (data.room === userCred.username &&
+        userCred.room === data.username)) addChatTyping(data);
   });
 
   socket.on('stop typing', (data) => {
     if ((!data.room && !userCred.room) ||
-        (data.room === userCred.username && userCred.room === data.username)) removeChatTyping(data);
+        (data.room === userCred.username &&
+        userCred.room === data.username)) removeChatTyping(data);
   });
 });
