@@ -228,3 +228,8 @@ ul {
   height: 40px;
   width: 40px;
 }
+
+.offlineMember { 
+  color: gray; 
+  font-style: italic;
+}

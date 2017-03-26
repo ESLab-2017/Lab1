@@ -36,6 +36,7 @@ $(() => {
   let lastTypingTime;
   let lastUser;
   let curInput = $uneInput.focus();
+  let allUsers = [];
 
   const socket = io();
 
@@ -233,14 +234,21 @@ $(() => {
       }
     } // handle users with same name (written very badly)
 
-    for (let i = 0; i < u.length; i += 1) {
+    for (let i = 0; i < allUsers.length; i += 1) {
       const item = document.createElement('li');
-      if (u[i] === userCred.username) {
-        item.innerHTML = `<span class="member"><b>${u[i]}</b> <i>(You)</i></span>`;
+      const currentUser = allUsers[i];
+      if (currentUser === userCred.username) { // if self, must be online
+        item.innerHTML = `<span class="member"><b>${currentUser}</b> <i>(You)</i></span>`;
         $memList[0].appendChild(item);
-      } else if (u[i] !== '') {
-        if (newMesList.find(el => el === u[i])) item.innerHTML = `<span class="member">💡 ${u[i]}</span>`;
-        else item.innerHTML = `<span class="member">${u[i]}</span>`;
+      }
+      else if (u.indexOf(currentUser) !== -1) { // if online
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="member">${currentUser}</span>`;
+        else item.innerHTML = `<span class="member">${currentUser}</span>`;
+        $memList[0].appendChild(item);
+      }
+      else { // if offline
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `<span class="offlineMember">💡 ${currentUser}</span>`;
+        else item.innerHTML = `<span class="offlineMember">${currentUser}</span>`;
         $memList[0].appendChild(item);
       }
     }
@@ -445,5 +453,14 @@ $(() => {
     if ((!data.room && !userCred.room) ||
         (data.room === userCred.username &&
         userCred.room === data.username)) removeChatTyping(data);
+  });
+
+  socket.on('update registered list', (data) => {
+    allUsers = data;
+    console.log('got updated registered list!');
+    for (var i = 0; i < allUsers.length; i++)
+    {
+      console.log(i + ": " + allUsers[i]);
+    }
   });
 });

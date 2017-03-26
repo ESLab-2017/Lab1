@@ -21,6 +21,20 @@ http.listen(port, () => {
 
 app.use(express.static(`${__dirname}/public`));
 
+// Get all registered users when server starts
+const allUsers = [];
+let usersCount = 0;
+MongoClient.connect(url, (err, db) => {
+  const userProfile = db.collection('userProfile');
+  let cursor;
+  cursor = userProfile.find({});
+  cursor.forEach((myDoc) => {
+    allUsers[usersCount] = myDoc.username;
+    usersCount++;
+  });
+  db.close();
+});
+
 function getUsersList() {
   const usersList = [];
   console.log('\n========== Current Users List ==========');
@@ -68,6 +82,8 @@ function findDocuments(db, wtfind, callback) {
 
 io.on('connection', (socket) => {
   let addedUser = false;
+
+  socket.emit('update registered list', allUsers); // when client connects, update its 'allUsers[]'
 
   socket.on('download message', (room) => {
     console.log('message downloaded');
@@ -164,7 +180,11 @@ io.on('connection', (socket) => {
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
-        if (!doc[0]) {
+        if (!doc[0]) { 
+          allUsers[usersCount] = user.username; 
+          usersCount++; // new users is registered, update 'allUsers[]'
+          socket.broadcast.emit('update registered list', allUsers);
+
           insertDocuments(db, {
             username: user.username,
             password: user.password,
@@ -220,11 +240,11 @@ io.on('connection', (socket) => {
         numUsers: clients.length,
         room: socket.room,
       });
+      console.log(`User ${clients[clients.indexOf(socket)].n} disconnected.`);
+      clients.splice(clients.indexOf(socket), 1);
       socket.broadcast.emit('update userlist', {
         list: getUsersList(),
       });
-      console.log(`User ${clients[clients.indexOf(socket)].n} disconnected.`);
-      clients.splice(clients.indexOf(socket), 1);
     }
   });
 });
