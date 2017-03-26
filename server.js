@@ -26,11 +26,10 @@ const allUsers = [];
 let usersCount = 0;
 MongoClient.connect(url, (err, db) => {
   const userProfile = db.collection('userProfile');
-  let cursor;
-  cursor = userProfile.find({});
+  const cursor = userProfile.find({});
   cursor.forEach((myDoc) => {
     allUsers[usersCount] = myDoc.username;
-    usersCount++;
+    usersCount += 1;
   });
   db.close();
 });
@@ -180,9 +179,9 @@ io.on('connection', (socket) => {
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
-        if (!doc[0]) { 
-          allUsers[usersCount] = user.username; 
-          usersCount++; // new users is registered, update 'allUsers[]'
+        if (!doc[0]) {
+          allUsers[usersCount] = user.username;
+          usersCount += 1; // new users is registered, update 'allUsers[]'
           socket.broadcast.emit('update registered list', allUsers);
 
           insertDocuments(db, {

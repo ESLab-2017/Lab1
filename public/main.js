@@ -240,13 +240,11 @@ $(() => {
       if (currentUser === userCred.username) { // if self, must be online
         item.innerHTML = `<span class="member"><b>${currentUser}</b> <i>(You)</i></span>`;
         $memList[0].appendChild(item);
-      }
-      else if (u.indexOf(currentUser) !== -1) { // if online
+      } else if (u.indexOf(currentUser) !== -1) { // if online
         if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="member">${currentUser}</span>`;
         else item.innerHTML = `<span class="member">${currentUser}</span>`;
         $memList[0].appendChild(item);
-      }
-      else { // if offline
+      } else { // if offline
         if (newMesList.find(el => el === currentUser)) item.innerHTML = `<span class="offlineMember">💡 ${currentUser}</span>`;
         else item.innerHTML = `<span class="offlineMember">${currentUser}</span>`;
         $memList[0].appendChild(item);
@@ -458,9 +456,8 @@ $(() => {
   socket.on('update registered list', (data) => {
     allUsers = data;
     console.log('got updated registered list!');
-    for (var i = 0; i < allUsers.length; i++)
-    {
-      console.log(i + ": " + allUsers[i]);
+    for (let i = 0; i < allUsers.length; i += 1) {
+      console.log(`${i}: ${allUsers[i]}`);
     }
   });
 });
