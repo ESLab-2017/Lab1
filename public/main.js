@@ -30,7 +30,8 @@ $(() => {
     password: '',
     room: '',
   };
-  const newMesList = [];
+  let newMesList = [];
+  let jsonMList = JSON.stringify(newMesList);
   let typing = false;
   let connected = false;
   let lastTypingTime;
@@ -156,6 +157,7 @@ $(() => {
     document.cookie = `userName=${userCred.username};path=/`;
     document.cookie = `userPass=${userCred.password};path=/`;
     socket.emit('download message', userCred.room);
+    socket.emit('update userlist');
   }
 
   function log(message, options) {
@@ -307,6 +309,24 @@ $(() => {
     location.reload();
   }
 
+  const loggedIn = getCookie('loggedIn');
+  // When page is reloaded, check cookie if logged in before
+  if (loggedIn) {
+    connected = true;
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    curInput = $mesInput.focus();
+    login(getCookie('userName'), getCookie('userPass'));
+    console.log(`Logged in before, user is: ${getCookie('userName')}`);
+    jsonMList = getCookie('jsonMList');
+    newMesList = JSON.parse(jsonMList);
+    console.log(newMesList);
+  } else {
+    $loginPage.show();
+    curInput = $uneInput.focus();
+  }
+
   $loginBtn.click(() => {
     login(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
   });
@@ -330,6 +350,10 @@ $(() => {
     }
   });
 
+  $window.unload(() => {
+    document.cookie = `jsonMList=${jsonMList};path=/`;
+  });
+
   $mesInput.on('input', () => {
     updateTyping();
   });
@@ -339,6 +363,7 @@ $(() => {
       if (newMesList.find(el => el === userCred.room)) {
         const tmp = newMesList.indexOf(userCred.room);
         if (tmp > -1) newMesList.splice(tmp, 1);
+        jsonMList = JSON.stringify(newMesList);
         socket.emit('update userlist');
       }
     });
@@ -362,6 +387,7 @@ $(() => {
       userCred.room = val.substr(val.search('💡') + 3);
       const tmp = newMesList.indexOf(userCred.room);
       if (tmp > -1) newMesList.splice(tmp, 1);
+      jsonMList = JSON.stringify(newMesList);
       socket.emit('update userlist');
       $messages.empty();
       socket.emit('download message', userCred.room);
@@ -371,21 +397,6 @@ $(() => {
       socket.emit('download message', userCred.room);
     }
   });
-
-  const loggedIn = getCookie('loggedIn');
-  // When page is reloaded, check cookie if logged in before
-  if (loggedIn) {
-    connected = true;
-    $loginPage.fadeOut();
-    $chatPage.show();
-    $loginPage.off('click');
-    curInput = $mesInput.focus();
-    login(getCookie('userName'), getCookie('userPass'));
-    console.log(`Logged in before, user is: ${getCookie('userName')}`);
-  } else {
-    $loginPage.show();
-    curInput = $uneInput.focus();
-  }
 
   // TODO: user is already logged on
   socket.on('login entry', (suc) => {
@@ -438,6 +449,7 @@ $(() => {
 
   socket.on('update userlist', (data) => {
     if (data.username) newMesList.push(data.username);
+    jsonMList = JSON.stringify(newMesList);
     updateUserList(data.list);
   });
 
