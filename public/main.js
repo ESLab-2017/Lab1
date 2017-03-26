@@ -247,7 +247,7 @@ $(() => {
         else item.innerHTML = `<span class="member">${currentUser}</span>`;
         $memList[0].appendChild(item);
       } else { // if offline
-        if (newMesList.find(el => el === currentUser)) item.innerHTML = `<span class="offlineMember">💡 ${currentUser}</span>`;
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="offlineMember">${currentUser}</span>`;
         else item.innerHTML = `<span class="offlineMember">${currentUser}</span>`;
         $memList[0].appendChild(item);
       }
