@@ -139,6 +139,7 @@ ul {
 .leftside {
   display: flex;
   flex-direction: column;
+  height: 100%;
   width: calc(100% - 200px);
 }
 
