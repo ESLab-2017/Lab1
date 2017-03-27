@@ -12,6 +12,7 @@ $(() => {
   const $loginPage = $('.login.page');
   const $chatPage = $('.new.page');
 
+  const $wrongText = $('.wrong')
   const $uneInput = $('.usernameInput');
   const $pwdInput = $('.passwordInput');
   const $loginBtn = $('.loginButton');
@@ -399,14 +400,18 @@ $(() => {
   });
 
   // TODO: user is already logged on
-  socket.on('login entry', (suc) => {
-    if (suc) {
+  socket.on('login entry', (json) => {
+    if (json.result) {
       loadChatPage();
     } else {
-      alert('Incorrect username or password!');
+      if (json.type === 'repeat') $wrongText.text('You\'ve already login from somewhere else');
+      else $wrongText.text('Incorrect username or password');
       userCred.username = '';
       userCred.password = '';
-      location.reload();
+      document.cookie = 'loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      $pwdInput.val('');
+      $loginBtn.text('Login');
+      // location.reload();
     }
   });
 
@@ -414,10 +419,12 @@ $(() => {
     if (suc) {
       loadChatPage();
     } else {
-      alert('Username is taken!');
+      $wrongText.text('Username is taken');
       userCred.username = '';
       userCred.password = '';
-      location.reload();
+      $pwdInput.val('');
+      $registerBtn.text('Login');
+      // location.reload();
     }
   });
 

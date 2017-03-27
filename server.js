@@ -144,16 +144,25 @@ io.on('connection', (socket) => {
     if (addedUser) return;
     MongoClient.connect(url, (err, db) => {
       assert.equal(null, err);
-      console.log(`User ${user.username} connected corroomtly to server`);
+      console.log(`User ${user.username} connected correctly to server`);
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
         if (!doc[0] || doc[0].password !== user.password) {
-          socket.emit('login entry', false);
+          socket.emit('login entry', {
+            result: false,
+          });
+        } else if (clients.find(el => el.n === user.username)) {
+          socket.emit('login entry', {
+            result: false,
+            type: 'repeat',
+          });
         } else {
           socket.join(user.username);
 
-          socket.emit('login entry', true);
+          socket.emit('login entry', {
+            result: true,
+          });
           addedUser = true;
           socket.username = user.username;
           clients.push(socket);

@@ -77,6 +77,12 @@ ul {
 
 .login.page .title {
   font-size: 200%;
+  margin: auto;
+}
+
+.login.page .wrong {
+  color: tomato;
+  margin: 1em auto 1em;
 }
 
 .login.page .usernameInput,
