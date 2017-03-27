@@ -1,221 +1,239 @@
 *,
 *:before,
 *:after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    font-weight: 300;
-    -webkit-font-smoothing: antialiased;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
 }
 
 html,
 input {
-    font-family: 'Ubuntu', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 html,
 body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 ul {
-    list-style: none;
-    word-wrap: break-word;
+  list-style: none;
+  word-wrap: break-word;
 }
 
 
 /* Pages */
 
 .pages {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 
 /* Login Page */
 
 .login.page {
-    height: 100%;
-    position: absolute;
-    width: 100%;
-    background-color: #3b5998;
+  display: none;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  background-color: #3b5998;
 }
 
 .login.page .form {
-    height: 100px;
-    margin-top: -100px;
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    top: 50%;
-    width: 100%;
+  height: 100px;
+  margin-top: -100px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  width: 100%;
 }
 
 .login.page .form .usernameInput,
 .passwordInput {
-    background-color: transparent;
-    border: none;
-    border-bottom: 2px solid #fff;
-    outline: none;
-    padding-bottom: 15px;
-    text-align: center;
-    width: 400px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #fff;
+  outline: none;
+  padding-bottom: 15px;
+  text-align: center;
+  width: 400px;
 }
 
 .login.page .form {
-    padding-bottom: 15px;
-    text-align: center;
+  padding-bottom: 15px;
+  text-align: center;
 }
 
 .login.page .title {
-    font-size: 200%;
+  font-size: 200%;
 }
 
 .login.page .usernameInput,
 .passwordInput {
-    font-size: 150%;
-    letter-spacing: 3px;
-    margin-bottom: 15px;
+  font-size: 150%;
+  letter-spacing: 3px;
+  margin-bottom: 15px;
 }
 
 .login.page .title,
 .login.page .usernameInput,
 .passwordInput {
-    color: #fff;
-    font-weight: 100;
+  color: #fff;
+  font-weight: 100;
 }
 
 .login.page .twobutton .loginButton,
 .registerButton {
-    height: 50px;
-    width: 200px;
-    font-size: 20px;
-    letter-spacing: 2px;
-    font-weight: 200;
+  height: 50px;
+  width: 200px;
+  font-size: 20px;
+  letter-spacing: 2px;
+  font-weight: 200;
+  background: #ffffff;
+  color: #3b5998;
+  border: none;
+  padding: 10px;
 }
 
 .spin {
-    height: 20px;
-    width: 20px;
+  height: 20px;
+  width: 20px;
 }
 
 
 /* Chat page */
 
 .new.page {
-    display: none;
+  display: none;
 }
 
 .chat.page {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    display: flex;
-    flex-flow: row wrap;
-    overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  display: flex;
+  flex-flow: row wrap;
+  overflow: hidden;
 }
 
 
 /* Left side */
 
 .leftside {
-    display: flex;
-    flex-direction: column;
-    width: calc(100% - 200px);
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 200px);
 }
 
-.chat.page header {
-    background: #3b5998;
-    color: #fff;
-    text-align: center;
-    height: 10%;
+.chat.page .header {
+  background: #3b5998;
+  color: #fff;
+  height: 10%;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
 }
 
 .chatArea {
-    background: #f7f7f7;
-    height: 80%;
-    border-bottom: 33px;
-    overflow-y: hidden;
+  background: #f7f7f7;
+  height: 80%;
+  border-bottom: 33px;
+  overflow-y: hidden;
 }
 
 
 /* Messages and Input */
 
 .inputMessage {
-    bottom: 0;
-    height: 10%;
-    width: 100%;
-    border: 0;
-    padding: 10px;
-    font-size: 100%;
-    outline: none;
+  bottom: 0;
+  height: 10%;
+  width: 100%;
+  border: 0;
+  padding: 10px;
+  font-size: 100%;
+  outline: none;
 }
 
 .messages {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-y: scroll;
-    padding: 10px 20px 10px 20px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: scroll;
+  padding: 10px 20px 10px 20px;
 }
 
 .messages li {
-    box-sizing: border-box;
-    height: 25px;
-    padding: 5px 10px;
+  box-sizing: border-box;
+  height: 25px;
+  padding: 5px 10px;
 }
 
 .messages .right {
-    text-align: right;
+  text-align: right;
 }
 
 .messages .time {
-    font-size: 6px;
-    color: #8E8E8E;
-    padding-top: 5px;
+  font-size: 6px;
+  color: #8E8E8E;
+  padding-top: 5px;
 }
 
 .messages .log {
-    color: gray;
-    font-size: 80%;
-    margin: 5px;
-    text-align: center;
+  color: gray;
+  font-size: 80%;
+  margin: 5px;
+  text-align: center;
 }
 
 .message.typing .messageBody {
-    color: gray;
+  color: gray;
 }
 
 .username {
-    font-weight: 700;
-    overflow: hidden;
-    padding-right: 15px;
-    text-align: right;
+  font-weight: 700;
+  overflow: hidden;
+  padding-right: 15px;
+  text-align: right;
+  white-space: pre;
 }
 
 
 /* Aside part */
 
 .chat.page aside {
-    background: #dfe3ee;
-    flex: 1;
+  background: #dfe3ee;
+  flex: 1;
 }
 
 .members {
-    text-align: center;
+  text-align: center;
 }
 
-#logoutButton {
-    position: fixed;
-    bottom: 20px;
-    right: 20px; 
-    height: 40px;
-    width: 40px;
+.all {
+  text-align: center;
+}
+
+.logoutButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 40px;
+  width: 40px;
+}
+
+.offlineMember {
+  color: gray;
+  font-style: italic;
 }
