@@ -40,6 +40,7 @@ ul {
 /* Login Page */
 
 .login.page {
+  display: none;
   height: 100%;
   position: absolute;
   width: 100%;
@@ -99,12 +100,17 @@ ul {
   font-size: 20px;
   letter-spacing: 2px;
   font-weight: 200;
+  background: #ffffff;
+  color: #3b5998;
+  border: none;
+  padding: 10px;
 }
 
 .spin {
   height: 20px;
   width: 20px;
 }
+
 
 /* Chat page */
 
@@ -130,11 +136,14 @@ ul {
   width: calc(100% - 200px);
 }
 
-.chat.page header {
+.chat.page .header {
   background: #3b5998;
   color: #fff;
-  text-align: center;
   height: 10%;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
 }
 
 .chatArea {
@@ -197,6 +206,7 @@ ul {
   overflow: hidden;
   padding-right: 15px;
   text-align: right;
+  white-space: pre;
 }
 
 
@@ -209,4 +219,21 @@ ul {
 
 .members {
   text-align: center;
+}
+
+.all {
+  text-align: center;
+}
+
+.logoutButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 40px;
+  width: 40px;
+}
+
+.offlineMember {
+  color: gray;
+  font-style: italic;
 }

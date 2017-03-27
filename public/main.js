@@ -16,15 +16,28 @@ $(() => {
   const $pwdInput = $('.passwordInput');
   const $loginBtn = $('.loginButton');
   const $registerBtn = $('.registerButton');
+  const $logoutBtn = $('.logoutButton');
 
   const $mesInput = $('.inputMessage');
   const $messages = $('.messages');
 
-  const userCred = { username: '', password: '' };
+  const $all = $('.all');
+  const $memList = $('.uList');
+  const $member = $('.member');
+
+  const userCred = {
+    username: '',
+    password: '',
+    room: '',
+  };
+  let newMesList = [];
+  let jsonMList = JSON.stringify(newMesList);
   let typing = false;
   let connected = false;
   let lastTypingTime;
+  let lastUser;
   let curInput = $uneInput.focus();
+  let allUsers = [];
 
   const socket = io();
 
@@ -107,6 +120,7 @@ $(() => {
       $messages.append($el);
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
+
     $('.tooltip').tooltipster({
       animation: 'grow',
       delay: 150,
@@ -115,22 +129,35 @@ $(() => {
     });
   }
 
-  function login() {
-    userCred.username = cleanInput($uneInput.val().trim());
-    userCred.password = cleanInput($pwdInput.val().trim());
+  function login(une, pwd) {
+    userCred.username = une;
+    userCred.password = pwd;
     if (userCred.username && userCred.password) {
       addSpinningIcon('login');
       socket.emit('login', userCred);
     }
   }
 
-  function register() {
-    userCred.username = cleanInput($uneInput.val().trim());
-    userCred.password = cleanInput($pwdInput.val().trim());
+  function register(une, pwd) {
+    userCred.username = une;
+    userCred.password = pwd;
     if (userCred.username && userCred.password) {
       addSpinningIcon('register');
       socket.emit('register', userCred);
     }
+  }
+
+  function loadChatPage() {
+    connected = true;
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    curInput = $mesInput.focus();
+    document.cookie = `loggedIn=${1};path=/`;
+    document.cookie = `userName=${userCred.username};path=/`;
+    document.cookie = `userPass=${userCred.password};path=/`;
+    socket.emit('download message', userCred.room);
+    socket.emit('update userlist');
   }
 
   function log(message, options) {
@@ -141,6 +168,7 @@ $(() => {
   function addChatMessage(data, options) {
     // Don't fade the message in if there is an 'X was typing'
     const $typingMessages = getTypingMessages(data);
+
     options = options || {};
     if ($typingMessages.length !== 0) {
       options.fade = false;
@@ -149,14 +177,23 @@ $(() => {
 
     const typingClass = data.typing ? 'typing' : '';
     const $messageBodyDiv = $('<span class="messageBody">')
-        .text(data.message)
-        .addClass('tooltip')
-        .prop('title', data.time);
+      .text(data.message)
+      .addClass('tooltip')
+      .prop('title', data.time);
     let $messageDiv;
-    if (data.username !== userCred.username) {
+    if (data.username !== userCred.username && (lastUser !== data.username || data.typing)) {
       const $usernameDiv = $('<span class="username"/>')
         .text(data.username)
         .css('color', getUsernameColor(data.username));
+
+      $messageDiv = $('<li class="message"/>')
+        .data('username', data.username)
+        .addClass(typingClass)
+        .append($usernameDiv, $messageBodyDiv);
+    } else if (data.username !== userCred.username) {
+      const $usernameDiv = $('<span class="username"/>')
+        .text(data.username)
+        .css('color', '#f7f7f7');
 
       $messageDiv = $('<li class="message"/>')
         .data('username', data.username)
@@ -169,7 +206,7 @@ $(() => {
         .addClass('right')
         .append($messageBodyDiv);
     }
-
+    if (!data.typing) lastUser = data.username;
     addMessageElement($messageDiv, options);
   }
 
@@ -179,6 +216,7 @@ $(() => {
       username: userCred.username,
       message: msg,
       time: dateTime(),
+      room: userCred.room,
     };
     if (msg && connected) {
       $mesInput.val('');
@@ -188,17 +226,31 @@ $(() => {
   }
 
   function updateUserList(u) {
-    const list = document.getElementById('ulist');
-    list.innerHTML = '';
+    $memList[0].innerHTML = '';
 
-    for (let i = 0; i < u.length; i += 1) {
-      const item = document.createElement('li');
-      if (u[i] === userCred.username) {
-        item.innerHTML = `<b>${u[i]}</b> <i>(You)</i>`;
-      } else {
-        item.innerHTML = u[i];
+    for (let i = 0; i < u.length - 1; i += 1) {
+      for (let j = i + 1; j < u.length; j += 1) {
+        if (u[i] === u[j]) {
+          u[j] = '';
+        }
       }
-      list.appendChild(item);
+    } // handle users with same name (written very badly)
+
+    for (let i = 0; i < allUsers.length; i += 1) {
+      const item = document.createElement('li');
+      const currentUser = allUsers[i];
+      if (currentUser === userCred.username) { // if self, must be online
+        item.innerHTML = `<span class="member"><b>${currentUser}</b> <i>(You)</i></span>`;
+        $memList[0].appendChild(item);
+      } else if (u.indexOf(currentUser) !== -1) { // if online
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="member">${currentUser}</span>`;
+        else item.innerHTML = `<span class="member">${currentUser}</span>`;
+        $memList[0].appendChild(item);
+      } else { // if offline
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="offlineMember">${currentUser}</span>`;
+        else item.innerHTML = `<span class="offlineMember">${currentUser}</span>`;
+        $memList[0].appendChild(item);
+      }
     }
   }
 
@@ -206,7 +258,7 @@ $(() => {
     if (connected) {
       if (!typing) {
         typing = true;
-        socket.emit('typing');
+        socket.emit('typing', userCred.room);
       }
       lastTypingTime = (new Date()).getTime();
 
@@ -214,7 +266,7 @@ $(() => {
         const typingTimer = (new Date()).getTime();
         const timeDiff = typingTimer - lastTypingTime;
         if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-          socket.emit('not typing');
+          socket.emit('not typing', userCred.room);
           typing = false;
         }
       }, TYPING_TIMER_LENGTH);
@@ -235,12 +287,52 @@ $(() => {
     });
   }
 
+  function getCookie(cname) {
+    const name = `${cname}=`;
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i += 1) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return '';
+  }
+
+  function logout() {
+    console.log('logout button clicked');
+    document.cookie = 'loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    location.reload();
+  }
+
+  const loggedIn = getCookie('loggedIn');
+  // When page is reloaded, check cookie if logged in before
+  if (loggedIn) {
+    connected = true;
+    $loginPage.fadeOut();
+    $chatPage.show();
+    $loginPage.off('click');
+    curInput = $mesInput.focus();
+    login(getCookie('userName'), getCookie('userPass'));
+    console.log(`Logged in before, user is: ${getCookie('userName')}`);
+    jsonMList = getCookie('jsonMList');
+    newMesList = JSON.parse(jsonMList);
+    console.log(newMesList);
+  } else {
+    $loginPage.show();
+    curInput = $uneInput.focus();
+  }
+
   $loginBtn.click(() => {
-    login();
+    login(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
   });
 
   $registerBtn.click(() => {
-    register();
+    register(cleanInput($uneInput.val().trim()), cleanInput($pwdInput.val().trim()));
   });
 
   $window.keydown((ev) => {
@@ -252,10 +344,14 @@ $(() => {
     if (ev.which === 13) {
       if (userCred.username) {
         sendMessage();
-        socket.emit('not typing');
+        socket.emit('not typing', userCred.room);
         typing = false;
       }
     }
+  });
+
+  $window.unload(() => {
+    document.cookie = `jsonMList=${jsonMList};path=/`;
   });
 
   $mesInput.on('input', () => {
@@ -263,16 +359,49 @@ $(() => {
   });
 
   $mesInput.click(() => {
-    $mesInput.focus();
+    $mesInput.focus(() => {
+      if (newMesList.find(el => el === userCred.room)) {
+        const tmp = newMesList.indexOf(userCred.room);
+        if (tmp > -1) newMesList.splice(tmp, 1);
+        jsonMList = JSON.stringify(newMesList);
+        socket.emit('update userlist');
+      }
+    });
   });
 
+  $logoutBtn.click(() => {
+    logout();
+  });
+
+  $all.click(() => {
+    if (userCred.room) {
+      userCred.room = '';
+      $messages.empty();
+      socket.emit('download message', userCred.room);
+    }
+  });
+
+  $memList.on('click', $member, (mem) => {
+    const val = mem.target.textContent;
+    if (val.search('💡') > -1) {
+      userCred.room = val.substr(val.search('💡') + 3);
+      const tmp = newMesList.indexOf(userCred.room);
+      if (tmp > -1) newMesList.splice(tmp, 1);
+      jsonMList = JSON.stringify(newMesList);
+      socket.emit('update userlist');
+      $messages.empty();
+      socket.emit('download message', userCred.room);
+    } else if (val !== userCred.username && val !== '(You)') {
+      userCred.room = val;
+      $messages.empty();
+      socket.emit('download message', userCred.room);
+    }
+  });
+
+  // TODO: user is already logged on
   socket.on('login entry', (suc) => {
     if (suc) {
-      connected = true;
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      curInput = $mesInput.focus();
+      loadChatPage();
     } else {
       alert('Incorrect username or password!');
       userCred.username = '';
@@ -283,11 +412,7 @@ $(() => {
 
   socket.on('register entry', (suc) => {
     if (suc) {
-      connected = true;
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      curInput = $mesInput.focus();
+      loadChatPage();
     } else {
       alert('Username is taken!');
       userCred.username = '';
@@ -296,27 +421,56 @@ $(() => {
     }
   });
 
-  socket.on('chat message', (msg) => {
-    addChatMessage(msg);
+  socket.on('welcome', (rm) => {
+    if (rm) log(`Private message with ${rm}`);
+    else log('Welcome to All');
   });
 
-  socket.on('info', (inf) => {
-    log(inf);
+  socket.on('chat message', (data) => {
+    if ((!data.room && !userCred.room) ||
+      (data.room === userCred.username &&
+        userCred.room === data.username) ||
+      (data.username === userCred.username &&
+        userCred.room === data.room)) addChatMessage(data);
   });
 
-  socket.on('update userlist', (list) => {
-    updateUserList(list);
+  socket.on('user joined', (data) => {
+    if ((!data.room && !userCred.room) ||
+      (data.room === userCred.username &&
+        userCred.room === data.username)) log(`${data.username} joined`);
   });
 
-  socket.on('typing signal', (usersList) => {
-    updateUserList(usersList);
+  socket.on('user left', (data) => {
+    if ((!data.room && !userCred.room) ||
+      (data.room === userCred.username &&
+        userCred.room === data.username)) log(`${data.username} left`);
+    removeChatTyping(data);
+  });
+
+  socket.on('update userlist', (data) => {
+    if (data.username) newMesList.push(data.username);
+    jsonMList = JSON.stringify(newMesList);
+    updateUserList(data.list);
   });
 
   socket.on('typing', (data) => {
-    addChatTyping(data);
+    if ((!data.room && !userCred.room) ||
+      (data.room === userCred.username &&
+        userCred.room === data.username)) addChatTyping(data);
   });
 
   socket.on('stop typing', (data) => {
-    removeChatTyping(data);
+    if ((!data.room && !userCred.room) ||
+      (data.room === userCred.username &&
+        userCred.room === data.username)) removeChatTyping(data);
+  });
+
+  socket.on('update registered list', (data) => {
+    allUsers = data;
+    console.log('got updated registered list!');
+    for (let i = 0; i < allUsers.length; i += 1) {
+      console.log(`${i}: ${allUsers[i]}`);
+    }
+    socket.emit('update userlist');
   });
 });
