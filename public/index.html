@@ -2,56 +2,55 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="img/Icon.png" />
-  <title>ESLab1 Chat Room</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu" />
-  <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/tooltipster.bundle.min.css" />
-  <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-borderless.min.css"
-  />
-  <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="img/Icon.png" />
+    <title>ESLab1 Chat Room</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu" />
+    <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/tooltipster.bundle.min.css" />
+    <link rel="stylesheet" type="text/css" href="tooltipster/dist/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-borderless.min.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
-  <ul class="pages">
-    <li class="new page">
-      <div class="chat page">
-        <div class="leftside">
-          <div class="header">
-            <h2>Messages</h2>
-          </div>
-          <div class="chatArea">
-            <ul class="messages"></ul>
-          </div>
-          <input class="inputMessage" type="text" autocomplete="off" placeholder="Say something" />
-        </div>
-        <aside>
-          <div class="all">
-            <h2>All</h2>
-          </div>
-          <h2 class="members">Members</h2>
-          <ul class="uList"></ul>
-          <img src="img/logout.png" class="logoutButton">
-        </aside>
-      </div>
-    </li>
-    <li class="login page">
-      <div class="form">
-        <h3 class="title">Welcome</h3>
-        <h6 class="wrong"></h6>
-        <input class="usernameInput" type="text" placeholder="USERNAME" maxlength="14" />
-        <input class="passwordInput" type="password" placeholder="PASSWORD" maxlength="14" />
-        <div class="twobutton">
-          <button type="submit" class="loginButton" id="loginButton">Login</button>
-          <button type="submit" class="registerButton" id="registerButton">Register</button>
-        </div>
-      </div>
-    </li>
-  </ul>
-  <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
-  <script type="text/javascript" src="tooltipster/dist/js/tooltipster.bundle.min.js"></script>
-  <script type="text/javascript" src="main.js"></script>
+    <ul class="pages">
+        <li class="new page">
+            <div class="chat page">
+                <div class="leftside">
+                    <div class="header">
+                        <h2>Messages</h2>
+                    </div>
+                    <div class="chatArea">
+                        <ul class="messages"></ul>
+                    </div>
+                    <input class="inputMessage" type="text" autocomplete="off" placeholder="Say something" />
+                </div>
+                <aside>
+                    <div class="all">
+                        <h2>All</h2>
+                    </div>
+                    <h2 class="members">Members</h2>
+                    <ul class="uList"></ul>
+                    <img src="img/logout.png" class="logoutButton">
+                </aside>
+            </div>
+        </li>
+        <li class="login page">
+            <div class="form">
+                <h3 class="title">歡迎</h3>
+                <h6 class="wrong"></h6>
+                <input class="usernameInput" type="text" placeholder="USERNAME" maxlength="14" />
+                <input class="passwordInput" type="password" placeholder="PASSWORD" maxlength="14" />
+                <div class="twobutton">
+                    <button type="submit" class="loginButton" id="loginButton">Login</button>
+                    <button type="submit" class="registerButton" id="registerButton">Register</button>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
 </body>
 
 </html>
