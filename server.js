@@ -238,8 +238,7 @@ io.on('connection', (socket) => {
 
           allUsers[usersCount] = user.username;
           usersCount += 1; // new users is registered, update 'allUsers[]'
-          socket.broadcast.emit('update registered list', allUsers);
-          socket.emit('update registered list', allUsers);
+          io.emit('update registered list', allUsers);
         } else {
           socket.emit('register entry', false);
         }
