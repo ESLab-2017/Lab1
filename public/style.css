@@ -85,6 +85,12 @@ ul {
   margin: 1em auto 1em;
 }
 
+.login.page .wrong.appear {
+  font-size: 14px;
+  color: tomato;
+  margin: 8px;
+}
+
 .login.page .usernameInput,
 .passwordInput {
   font-size: 150%;
@@ -105,7 +111,7 @@ ul {
   width: 200px;
   font-size: 20px;
   letter-spacing: 2px;
-  font-weight: 200;
+  font-weight: 210;
   background: #ffffff;
   color: #4C70BA;
   border: none;
@@ -203,8 +209,6 @@ ul {
 }
 
 .right-bubble {
-  margin-left: auto;
-  margin-right: 0;
   background-color: #4C70BA;
   color: #fff;
 }
