@@ -164,7 +164,8 @@ io.on('connection', (socket) => {
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
-        const encrpytData = sha512(user.password, doc[0].salt);
+        let encrpytData;
+        if (doc[0].salt) encrpytData = sha512(user.password, doc[0].salt);
         if (!doc[0] || encrpytData.passwordHash !== doc[0].hash) {
           socket.emit('login entry', {
             result: false,
