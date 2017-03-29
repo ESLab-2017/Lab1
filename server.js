@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 
 const app = express();
 const http = require('http').Server(app);
@@ -33,6 +34,21 @@ MongoClient.connect(url, (err, db) => {
   });
   db.close();
 });
+
+const genRandomString = length =>
+  crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex') /** convert to hexadecimal format */
+        .slice(0, length);   /** return required number of characters */
+
+const sha512 = (password, salt) => {
+  const hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+  hash.update(password);
+  const value = hash.digest('hex');
+  return {
+    salt,
+    passwordHash: value,
+  };
+};
 
 function getUsersList() {
   const usersList = [];
@@ -148,7 +164,8 @@ io.on('connection', (socket) => {
       findDocuments(db, {
         username: user.username,
       }, (doc) => {
-        if (!doc[0] || doc[0].password !== user.password) {
+        const encrpytData = sha512(user.password, doc[0].salt);
+        if (!doc[0] || encrpytData.passwordHash !== doc[0].hash) {
           socket.emit('login entry', {
             result: false,
           });
@@ -191,9 +208,11 @@ io.on('connection', (socket) => {
         username: user.username,
       }, (doc) => {
         if (!doc[0]) {
+          const pwdData = sha512(user.password, genRandomString(16));
           insertDocuments(db, {
             username: user.username,
-            password: user.password,
+            salt: pwdData.salt,
+            hash: pwdData.passwordHash,
           }, () => {});
 
           socket.join(user.username);
