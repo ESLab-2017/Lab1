@@ -1,6 +1,6 @@
 $(() => {
-  const FADE_TIME = 150;
-  const TYPING_TIMER_LENGTH = 510;
+  const FADE_TIME = 300;
+  const TYPING_TIMER_LENGTH = 500;
   const COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
@@ -177,35 +177,45 @@ $(() => {
     }
 
     const typingClass = data.typing ? 'typing' : '';
-    const $messageBodyDiv = $('<span class="messageBody">')
+    const $messageBodyDiv = $('<div class="messageBody">')
       .text(data.message)
       .addClass('tooltip')
       .prop('title', data.time);
+    const $messageBub = $('<div/>')
+      .append($messageBodyDiv);
     let $messageDiv;
     if (data.username !== userCred.username && (lastUser !== data.username || data.typing)) {
-      const $usernameDiv = $('<span class="username"/>')
+      const $usernameDiv = $('<div class="username"/>')
         .text(data.username)
         .css('color', getUsernameColor(data.username));
 
-      $messageDiv = $('<li class="message"/>')
-        .data('username', data.username)
-        .addClass(typingClass)
-        .append($usernameDiv, $messageBodyDiv);
-    } else if (data.username !== userCred.username) {
-      const $usernameDiv = $('<span class="username"/>')
-        .text(data.username)
-        .css('color', '#f7f7f7');
+      $messageBub.addClass('talk-bubble');
 
       $messageDiv = $('<li class="message"/>')
         .data('username', data.username)
         .addClass(typingClass)
-        .append($usernameDiv, $messageBodyDiv);
+        .append($usernameDiv, $messageBub);
+    } else if (data.username !== userCred.username) {
+      const $usernameDiv = $('<div class="username"/>')
+        .text(data.username)
+        .css('color', '#f7f7f7');
+
+      $messageBub.addClass('talk-bubble');
+
+      $messageDiv = $('<li class="message"/>')
+        .data('username', data.username)
+        .addClass(typingClass)
+        .append($usernameDiv, $messageBub);
     } else {
+      $messageBub
+        .addClass('talk-bubble')
+        .addClass('right-bubble');
+
       $messageDiv = $('<li class="message"/>')
         .data('username', data.username)
         .addClass(typingClass)
         .addClass('right')
-        .append($messageBodyDiv);
+        .append($messageBub);
     }
     if (!data.typing) lastUser = data.username;
     addMessageElement($messageDiv, options);
@@ -244,12 +254,12 @@ $(() => {
         item.innerHTML = `<span class="member"><b>${currentUser}</b> <i>(You)</i></span>`;
         $memList[0].appendChild(item);
       } else if (u.indexOf(currentUser) !== -1) { // if online
-        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="member">${currentUser}</span>`;
-        else item.innerHTML = `<span class="member">${currentUser}</span>`;
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <a href="javascript:void(0);" class="member">${currentUser}</span>`;
+        else item.innerHTML = `<a href="javascript:void(0);" class="member">${currentUser}</span>`;
         $memList[0].appendChild(item);
       } else { // if offline
-        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <span class="offlineMember">${currentUser}</span>`;
-        else item.innerHTML = `<span class="offlineMember">${currentUser}</span>`;
+        if (newMesList.find(el => el === currentUser)) item.innerHTML = `💡 <a href="javascript:void(0);" class="offlineMember">${currentUser}</span>`;
+        else item.innerHTML = `<a href="javascript:void(0);" class="offlineMember">${currentUser}</a>`;
         $memList[0].appendChild(item);
       }
     }
@@ -317,7 +327,7 @@ $(() => {
         icon: 'img/message.png',
         body: data.message,
       });
-      notification.onclick = function () {
+      notification.onclick = () => {
         const val = data.username;
         userCred.room = val;
         $messages.empty();

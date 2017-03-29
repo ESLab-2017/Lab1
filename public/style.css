@@ -44,7 +44,7 @@ ul {
   height: 100%;
   position: absolute;
   width: 100%;
-  background-color: #3b5998;
+  background-color: #4C70BA;
 }
 
 .login.page .form {
@@ -107,7 +107,7 @@ ul {
   letter-spacing: 2px;
   font-weight: 200;
   background: #ffffff;
-  color: #3b5998;
+  color: #4C70BA;
   border: none;
   padding: 10px;
 }
@@ -144,7 +144,7 @@ ul {
 }
 
 .chat.page .header {
-  background: #3b5998;
+  background: #4C70BA;
   color: #fff;
   height: 10%;
   min-height: 48px;
@@ -179,12 +179,47 @@ ul {
   padding: 0;
   overflow-y: scroll;
   padding: 10px 20px 10px 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .messages li {
   box-sizing: border-box;
-  height: 25px;
+  height: auto;
   padding: 5px 10px;
+}
+
+.talk-bubble {
+  display: inline-block;
+	margin: 5px 0 0 10px;
+  position: relative;
+  width: auto;
+	max-width: 250px;
+	height: auto;
+	background-color: #EAEAEA;
+  border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+}
+
+.right-bubble {
+  margin-left: auto;
+  margin-right: 0;
+  background-color: #4C70BA;
+  color: #fff;
+}
+
+.tri-right.right-top:after {
+	content: ' ';
+	position: absolute;
+	width: 0;
+	height: 0;
+  left: auto;
+	right: -15px;
+  top: 0px;
+	bottom: auto;
+	border: 15px solid;
+	border-color: lightgray transparent transparent transparent;
 }
 
 .messages .right {
@@ -209,11 +244,18 @@ ul {
 }
 
 .username {
+  display: inline-block;
+  margin-top: 10px;
   font-weight: 700;
   overflow: hidden;
   padding-right: 15px;
   text-align: right;
   white-space: pre;
+}
+
+.messageBody {
+  padding: 0.4em 0.75em;
+  line-height: 1.5em;
 }
 
 
@@ -241,9 +283,23 @@ ul {
   width: 40px;
 }
 
-.offlineMember {
+a.member {
+  color: #000;
+  text-decoration: none;
+}
+
+a.member:hover {
+  text-decoration: underline;
+}
+
+a.offlineMember {
   color: gray;
   font-style: italic;
+  text-decoration: none;
+}
+
+a.offlineMember:hover {
+  text-decoration: underline;
 }
 
 .button-fill {
@@ -255,7 +311,7 @@ ul {
   margin: 10px;
 }
 .button-fill.grey {
-  background: #3b5998;
+  background: #4C70BA;
   color: white;
 }
 
@@ -273,7 +329,7 @@ ul {
   top: 1px;
   left: 50%;
   line-height: 54px;
-  color: #3b5998;
+  color: #4C70BA;
   background: #fff;
   text-align: center;
   overflow: hidden;
@@ -287,7 +343,7 @@ ul {
   left: 0%;
   top: 0;
   margin-right: -50px;
-  border: 1px solid #3b5998;
+  border: 1px solid #4C70BA;
 }
 .inside-text {
   text-align: center;
