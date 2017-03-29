@@ -398,6 +398,12 @@ $(() => {
     }
   });
 
+  $('.button-fill').hover(() => {
+    $('.button-fill').children('.button-inside').addClass('full');
+  }, () => {
+    $('.button-fill').children('.button-inside').removeClass('full');
+  });
+
   $memList.on('click', $member, (mem) => {
     const val = mem.target.textContent;
     if (val.search('💡') > -1) {
