@@ -435,8 +435,15 @@ $(() => {
     if (json.result) {
       loadChatPage();
     } else {
-      if (json.type === 'repeat') $wrongText.text('❗ You\'ve already login from somewhere else');
-      else $wrongText.text('❌ Incorrect username or password');
+      if (json.type === 'repeat') {
+        $wrongText
+          .addClass('appear')
+          .text('❗ You\'ve already login from somewhere else');
+      } else {
+        $wrongText
+          .addClass('appear')
+          .text('❌ Incorrect username or password');
+      }
       userCred.username = '';
       userCred.password = '';
       document.cookie = 'loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -450,7 +457,9 @@ $(() => {
     if (suc) {
       loadChatPage();
     } else {
-      $wrongText.text('❗ Username is taken');
+      $wrongText
+        .addClass('appear')
+        .text('❗ Username is taken');
       userCred.username = '';
       userCred.password = '';
       $pwdInput.val('');
