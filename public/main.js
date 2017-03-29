@@ -435,12 +435,16 @@ $(() => {
     } else {
       if (json.type === 'repeat') {
         $wrongText
+          .hide()
           .addClass('appear')
-          .text('You\'ve already login from somewhere else');
+          .text('You\'ve already login from somewhere else')
+          .fadeIn(FADE_TIME);
       } else {
         $wrongText
+          .hide()
           .addClass('appear')
-          .text('Incorrect username or password');
+          .text('Incorrect username or password')
+          .fadeIn(FADE_TIME);
       }
       userCred.username = '';
       userCred.password = '';
@@ -455,8 +459,10 @@ $(() => {
       loadChatPage();
     } else {
       $wrongText
+        .hide()
         .addClass('appear')
-        .text('Username is taken');
+        .text('Username is taken')
+        .fadeIn(FADE_TIME);
       userCred.username = '';
       userCred.password = '';
       $pwdInput.val('');
