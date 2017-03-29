@@ -455,7 +455,7 @@ $(() => {
       userCred.username = '';
       userCred.password = '';
       $pwdInput.val('');
-      $registerBtn.text('Login');
+      $registerBtn.text('Register');
       // location.reload();
     }
   });
