@@ -314,7 +314,6 @@ $(() => {
   }
 
   function logout() {
-    console.log('logout button clicked');
     document.cookie = 'loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     location.reload();
   }
@@ -345,7 +344,6 @@ $(() => {
     $loginPage.off('click');
     curInput = $mesInput.focus();
     login(getCookie('userName'), getCookie('userPass'));
-    console.log(`Logged in before, user is: ${getCookie('userName')}`);
     jsonMList = getCookie('jsonMList');
     newMesList = JSON.parse(jsonMList);
   } else {
@@ -438,18 +436,17 @@ $(() => {
       if (json.type === 'repeat') {
         $wrongText
           .addClass('appear')
-          .text('❗ You\'ve already login from somewhere else');
+          .text('You\'ve already login from somewhere else');
       } else {
         $wrongText
           .addClass('appear')
-          .text('❌ Incorrect username or password');
+          .text('Incorrect username or password');
       }
       userCred.username = '';
       userCred.password = '';
       document.cookie = 'loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       $pwdInput.val('');
       $loginBtn.text('Login');
-      // location.reload();
     }
   });
 
@@ -459,12 +456,11 @@ $(() => {
     } else {
       $wrongText
         .addClass('appear')
-        .text('❗ Username is taken');
+        .text('Username is taken');
       userCred.username = '';
       userCred.password = '';
       $pwdInput.val('');
       $registerBtn.text('Register');
-      // location.reload();
     }
   });
 
@@ -481,7 +477,6 @@ $(() => {
         userCred.room === data.room)) addChatMessage(data);
     if ((data.room === userCred.username && // notify if user not in the room
         userCred.room !== data.username)) {
-      console.log('notify triggered!');
       notifyMe(data);
     }
   });
@@ -519,10 +514,6 @@ $(() => {
 
   socket.on('update registered list', (data) => {
     allUsers = data;
-    console.log('got updated registered list!');
-    for (let i = 0; i < allUsers.length; i += 1) {
-      console.log(`${i}: ${allUsers[i]}`);
-    }
     socket.emit('update userlist');
   });
 });
