@@ -1,4 +1,7 @@
 language: node_js
 node_js:
   - "7"
-script: node server.js
+install:
+  - npm install
+script: 
+  - node server.js
