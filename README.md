@@ -1,6 +1,6 @@
 Chat Room
 =========
-[![Build Status](https://travis-ci.org/ESLab-2017/Lab1.svg?branch=master)](https://travis-ci.org/ESLab-2017/Lab1) [![Demo](https://camo.githubusercontent.com/d57a88a378dd7ed232931397d903da874daa7809/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f64656d6f2d6f6e6c696e652d677265656e2e737667)](eslab1.azurewebsites.net)  
+[![Build Status](https://travis-ci.org/ESLab-2017/Lab1.svg?branch=master)](https://travis-ci.org/ESLab-2017/Lab1) [![Demo](https://camo.githubusercontent.com/d57a88a378dd7ed232931397d903da874daa7809/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f64656d6f2d6f6e6c696e652d677265656e2e737667)](http://eslab1.azurewebsites.net)  
   
 This is a Node.js chat room powered by Express and socket.io.
 
