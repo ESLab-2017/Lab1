@@ -17,6 +17,6 @@
     "eslint-plugin-react": "^6.10.0"
   },
   "scripts": {
-    "test": "eslint ."
+    "test": "eslint server.js, public/main.js"
   }
 }
