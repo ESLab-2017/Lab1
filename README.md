@@ -27,12 +27,12 @@ There is a working live demo at [http://eslab1.azurewebsites.net/](http://eslab1
 
 #### Get the source code  
 
-	git clone https://github.com/ESLab-2017/Lab1.git 
-	cd Lab1
+	$ git clone https://github.com/ESLab-2017/Lab1.git 
+	$ cd Lab1
 	
 #### Download and install all the dependencies
 
-	npm install
+	$ npm install
 
   
 ---
@@ -41,7 +41,7 @@ There is a working live demo at [http://eslab1.azurewebsites.net/](http://eslab1
 
 #### Start server
 
-	npm start
+	$ npm start
 
 #### Open a browser and go to 
 
